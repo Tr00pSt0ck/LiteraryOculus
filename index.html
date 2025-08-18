@@ -1254,29 +1254,10 @@
         let isAppInstalled = false;
 
         // Check if app is already installed
-        function checkIfAppInstalled() {
-            // Check for standalone mode
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                isAppInstalled = true;
-                return true;
-            }
-            
-            // Check if app is installed via navigator
-            if (window.navigator.standalone) {
-                isAppInstalled = true;
-                return true;
-            }
-            
-            // Check for iOS PWA
-            if (window.navigator.userAgent.includes('Safari') && !window.navigator.userAgent.includes('Chrome')) {
-                const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
-                if (isInStandaloneMode) {
-                    isAppInstalled = true;
-                    return true;
-                }
-            }
-            
-            return false;
+        function checkIsAppInstalled() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone ||
+                   document.referrer.includes('android-app://');
         }
 
         // PWA Install Prompt
@@ -1290,7 +1271,9 @@
             if (!isAppInstalled) {
                 // Show the install banner after 5 seconds
                 setTimeout(() => {
-                    installBanner.classList.add('show');
+                    if (!isAppInstalled) {
+                        installBanner.classList.add('show');
+                    }
                 }, 5000);
             }
         });
@@ -1328,21 +1311,11 @@
 
         dismissBtn.addEventListener('click', () => {
             installBanner.classList.remove('show');
-            // Store dismissal for 30 days
-            localStorage.setItem('bannerDismissed', Date.now());
         });
 
         // Show banner after 5 seconds if event didn't trigger
         setTimeout(() => {
-            // Check if user dismissed banner in last 30 days
-            const dismissedTime = localStorage.getItem('bannerDismissed');
-            const thirtyDays = 30 * 24 * 60 * 60 * 1000;
-            
-            if (dismissedTime && (Date.now() - dismissedTime < thirtyDays)) {
-                return;
-            }
-            
-            if (!installBanner.classList.contains('show') && !isAppInstalled && deferredPrompt) {
+            if (!installBanner.classList.contains('show') && !isAppInstalled) {
                 installBanner.classList.add('show');
             }
         }, 5000);
@@ -1642,8 +1615,12 @@
 
         // Initialize the app
         function init() {
-            // Check if app is installed
-            isAppInstalled = checkIfAppInstalled();
+            // Check if app is already installed
+            isAppInstalled = checkIsAppInstalled();
+            if (isAppInstalled) {
+                console.log("App is already installed - hiding banner");
+                installBanner.style.display = "none";
+            }
             
             loadUsers();
             

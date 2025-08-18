@@ -8,8 +8,8 @@
     <meta name="msapplication-TileImage" content="/icons/favicon-144x144.png">
     <meta name="msapplication-TileColor" content="#825e32">
     <title>Literary Oculus | Writer's Vocabulary Tracker</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="/icons/favicon-192x192.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Literary Oculus">
@@ -1204,219 +1204,165 @@
         </div>
     </div>
 
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyArwyB6tsugLz2db_NxNLwhRzbnFpjcoPM",
-            authDomain: "literary-oculus.firebaseapp.com",
-            projectId: "literary-oculus",
-            storageBucket: "literary-oculus.appspot.com",
-            messagingSenderId: "721507977834",
-            appId: "721507977834"
-        };
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyArwyB6tsugLz2db_NxNLwhRzbnFpjcoPM",
+        authDomain: "literary-oculus.firebaseapp.com",
+        projectId: "literary-oculus",
+        storageBucket: "literary-oculus.appspot.com",
+        messagingSenderId: "721507977834",
+        appId: "721507977834"
+    };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        // DOM Elements
-        const loadingScreen = document.getElementById('loading-screen');
-        const mainContainer = document.getElementById('main-container');
-        const userSelection = document.getElementById('user-selection');
-        const userList = document.getElementById('user-list');
-        const appContent = document.getElementById('app-content');
-        const startBtn = document.getElementById('start-btn');
-        const currentUserName = document.getElementById('current-user-name');
-        const wordForm = document.getElementById('word-form');
-        const wordsListContainer = document.getElementById('words-list');
-        const wordCount = document.getElementById('word-count').querySelector('span');
-        const randomWordBtn = document.getElementById('random-word-btn');
-        const notification = document.getElementById('notification');
-        const notificationTitle = document.getElementById('notification-title');
-        const notificationMessage = document.getElementById('notification-message');
-        const popupOverlay = document.getElementById('popup-overlay');
-        const closePopup = document.getElementById('close-popup');
-        const popupWord = document.getElementById('popup-word');
-        const popupPronunciation = document.getElementById('popup-pronunciation');
-        const popupDefinition = document.getElementById('popup-definition');
-        const popupUser = document.getElementById('popup-user');
-        const formToggle = document.getElementById('form-toggle');
-        const formContent = document.getElementById('form-content');
-        const installBanner = document.getElementById('pwa-install-banner');
-        const installBtn = document.getElementById('install-pwa');
-        const dismissBtn = document.getElementById('dismiss-banner');
+    // DOM Elements
+    const loadingScreen = document.getElementById('loading-screen');
+    const mainContainer = document.getElementById('main-container');
+    const userSelection = document.getElementById('user-selection');
+    const userList = document.getElementById('user-list');
+    const appContent = document.getElementById('app-content');
+    const startBtn = document.getElementById('start-btn');
+    const currentUserName = document.getElementById('current-user-name');
+    const wordForm = document.getElementById('word-form');
+    const wordsListContainer = document.getElementById('words-list');
+    const wordCount = document.getElementById('word-count').querySelector('span');
+    const randomWordBtn = document.getElementById('random-word-btn');
+    const notification = document.getElementById('notification');
+    const notificationTitle = document.getElementById('notification-title');
+    const notificationMessage = document.getElementById('notification-message');
+    const popupOverlay = document.getElementById('popup-overlay');
+    const closePopup = document.getElementById('close-popup');
+    const popupWord = document.getElementById('popup-word');
+    const popupPronunciation = document.getElementById('popup-pronunciation');
+    const popupDefinition = document.getElementById('popup-definition');
+    const popupUser = document.getElementById('popup-user');
+    const formToggle = document.getElementById('form-toggle');
+    const formContent = document.getElementById('form-content');
+    const installBanner = document.getElementById('pwa-install-banner');
+    const installBtn = document.getElementById('install-pwa');
+    const dismissBtn = document.getElementById('dismiss-banner');
 
-        // State
-        let currentUser = null;
-        let words = [];
-        let users = [];
-        let deferredPrompt = null;
-        let isAppInstalled = false;
+    // State
+    let currentUser = null;
+    let words = [];
+    let users = [];
+    let deferredPrompt = null;
 
-        // Check if app is already installed
-        function checkIsAppInstalled() {
-            return window.matchMedia('(display-mode: standalone)').matches || 
-                   window.navigator.standalone ||
-                   document.referrer.includes('android-app://');
-        }
+    // Check if app is running in standalone mode
+    function isRunningStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches || 
+               window.navigator.standalone === true;
+    }
 
-        // PWA Install Prompt
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing on mobile
-            e.preventDefault();
+    // PWA Install Prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        
+        // Only proceed if not running in standalone mode
+        if (!isRunningStandalone()) {
             // Stash the event so it can be triggered later
             deferredPrompt = e;
             
-            // Only show the banner if app isn't already installed
-            if (!isAppInstalled) {
-                // Show the install banner after 5 seconds
-                setTimeout(() => {
-                    if (!isAppInstalled) {
-                        installBanner.classList.add('show');
-                    }
-                }, 5000);
-            }
-        });
-
-        window.addEventListener('appinstalled', () => {
-            console.log('App installed');
-            isAppInstalled = true;
-            installBanner.classList.remove('show');
-            deferredPrompt = null;
-        });
-
-        installBtn.addEventListener('click', async () => {
-            if (!deferredPrompt) return;
-            
-            // Show the install prompt
-            deferredPrompt.prompt();
-            
-            // Wait for the user to respond to the prompt
-            const { outcome } = await deferredPrompt.userChoice;
-            
-            if (outcome === 'accepted') {
-                console.log('User accepted the install prompt');
-                // Set installed flag
-                isAppInstalled = true;
-            } else {
-                console.log('User dismissed the install prompt');
-            }
-            
-            // Hide the install banner
-            installBanner.classList.remove('show');
-            
-            // Reset the deferred prompt variable
-            deferredPrompt = null;
-        });
-
-        dismissBtn.addEventListener('click', () => {
-            installBanner.classList.remove('show');
-        });
-
-        // Show banner after 5 seconds if event didn't trigger
-        setTimeout(() => {
-            if (!installBanner.classList.contains('show') && !isAppInstalled) {
-                installBanner.classList.add('show');
-            }
-        }, 5000);
-
-        // Collapsible form functionality
-        formToggle.addEventListener('click', () => {
-            const isCollapsed = formToggle.classList.contains('collapsed');
-            
-            if (isCollapsed) {
-                formToggle.classList.remove('collapsed');
-                formToggle.classList.add('expanded');
-                formContent.style.height = formContent.scrollHeight + 'px';
-            } else {
-                formToggle.classList.remove('expanded');
-                formToggle.classList.add('collapsed');
-                formContent.style.height = '0';
-            }
-        });
-
-        // Show notification function
-        function showNotification(title, message, isSuccess = true) {
-            notificationTitle.textContent = title;
-            notificationMessage.textContent = message;
-            
-            if (isSuccess) {
-                notification.classList.remove('error');
-            } else {
-                notification.classList.add('error');
-            }
-            
-            notification.classList.add('show');
-            
+            // Show the install banner after 5 seconds
             setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3500);
+                if (deferredPrompt && !isRunningStandalone()) {
+                    installBanner.classList.add('show');
+                }
+            }, 5000);
         }
+    });
 
-        // Load user profiles from Firestore
-        async function loadUsers() {
-            try {
-                const usersSnapshot = await db.collection('users').get();
-                users = [];
-                userList.innerHTML = '';
-                
-                usersSnapshot.forEach(doc => {
-                    const user = {
-                        id: doc.id,
-                        ...doc.data()
-                    };
-                    users.push(user);
-                    
-                    // Create user card
-                    const userCard = document.createElement('div');
-                    userCard.className = 'user-card';
-                    if (doc.id === 'Ernest_Hemingway') userCard.classList.add('active');
-                    
-                    userCard.innerHTML = `
-                        <i class="fas fa-user"></i>
-                        <span>${user.name}</span>
-                    `;
-                    
-                    userCard.addEventListener('click', function() {
-                        document.querySelectorAll('.user-card').forEach(c => {
-                            c.classList.remove('active');
-                        });
-                        this.classList.add('active');
-                    });
-                    
-                    userList.appendChild(userCard);
-                });
-                
-                // Show user selection
-                userSelection.classList.add('show');
-                
-            } catch (error) {
-                console.error("Error loading users: ", error);
-                showNotification('Error', 'Failed to load writer profiles', false);
-                
-                // Fallback to default users if Firestore fails
-                const defaultUsers = [
-                    { id: 'Ernest_Hemingway', name: 'Ernest Hemingway' },
-                    { id: 'Virginia_Woolf', name: 'Virginia Woolf' },
-                    { id: 'Toni_Morrison', name: 'Toni Morrison' }
-                ];
-                
-                users = defaultUsers;
-                renderUserCards(defaultUsers);
-                
-                // Show user selection
-                userSelection.classList.add('show');
-            }
+    installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        
+        // Show the install prompt
+        deferredPrompt.prompt();
+        
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+        } else {
+            console.log('User dismissed the install prompt');
         }
+        
+        // Hide the install banner
+        installBanner.classList.remove('show');
+        
+        // Reset the deferred prompt variable
+        deferredPrompt = null;
+    });
 
-        // Render user cards
-        function renderUserCards(users) {
+    dismissBtn.addEventListener('click', () => {
+        installBanner.classList.remove('show');
+    });
+
+    // Show banner after 5 seconds if event didn't trigger and not standalone
+    setTimeout(() => {
+        if (!installBanner.classList.contains('show') && 
+            deferredPrompt && 
+            !isRunningStandalone()) {
+            installBanner.classList.add('show');
+        }
+    }, 5000);
+
+    // Collapsible form functionality
+    formToggle.addEventListener('click', () => {
+        const isCollapsed = formToggle.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+            formToggle.classList.remove('collapsed');
+            formToggle.classList.add('expanded');
+            formContent.style.height = formContent.scrollHeight + 'px';
+        } else {
+            formToggle.classList.remove('expanded');
+            formToggle.classList.add('collapsed');
+            formContent.style.height = '0';
+        }
+    });
+
+    // Show notification function
+    function showNotification(title, message, isSuccess = true) {
+        notificationTitle.textContent = title;
+        notificationMessage.textContent = message;
+        
+        if (isSuccess) {
+            notification.classList.remove('error');
+        } else {
+            notification.classList.add('error');
+        }
+        
+        notification.classList.add('show');
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3500);
+    }
+
+    // Load user profiles from Firestore
+    async function loadUsers() {
+        try {
+            const usersSnapshot = await db.collection('users').get();
+            users = [];
             userList.innerHTML = '';
             
-            users.forEach(user => {
+            usersSnapshot.forEach(doc => {
+                const user = {
+                    id: doc.id,
+                    ...doc.data()
+                };
+                users.push(user);
+                
+                // Create user card
                 const userCard = document.createElement('div');
                 userCard.className = 'user-card';
-                if (user.id === 'Ernest_Hemingway') userCard.classList.add('active');
+                if (doc.id === 'Ernest_Hemingway') userCard.classList.add('active');
                 
                 userCard.innerHTML = `
                     <i class="fas fa-user"></i>
@@ -1432,223 +1378,262 @@
                 
                 userList.appendChild(userCard);
             });
+            
+            // Show user selection
+            userSelection.classList.add('show');
+            
+        } catch (error) {
+            console.error("Error loading users: ", error);
+            showNotification('Error', 'Failed to load writer profiles', false);
+            
+            // Fallback to default users if Firestore fails
+            const defaultUsers = [
+                { id: 'Ernest_Hemingway', name: 'Ernest Hemingway' },
+                { id: 'Virginia_Woolf', name: 'Virginia Woolf' },
+                { id: 'Toni_Morrison', name: 'Toni Morrison' }
+            ];
+            
+            users = defaultUsers;
+            renderUserCards(defaultUsers);
+            
+            // Show user selection
+            userSelection.classList.add('show');
         }
+    }
 
-        // Load all words from central collection
-        async function loadWords() {
-            try {
-                wordsListContainer.innerHTML = '';
-                const wordsSnapshot = await db.collection('words')
-                    .orderBy('timestamp', 'desc')
-                    .get();
+    // Render user cards
+    function renderUserCards(users) {
+        userList.innerHTML = '';
+        
+        users.forEach(user => {
+            const userCard = document.createElement('div');
+            userCard.className = 'user-card';
+            if (user.id === 'Ernest_Hemingway') userCard.classList.add('active');
+            
+            userCard.innerHTML = `
+                <i class="fas fa-user"></i>
+                <span>${user.name}</span>
+            `;
+            
+            userCard.addEventListener('click', function() {
+                document.querySelectorAll('.user-card').forEach(c => {
+                    c.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+            
+            userList.appendChild(userCard);
+        });
+    }
+
+    // Load all words from central collection
+    async function loadWords() {
+        try {
+            wordsListContainer.innerHTML = '';
+            const wordsSnapshot = await db.collection('words')
+                .orderBy('timestamp', 'desc')
+                .get();
+            
+            words = [];
+            wordsSnapshot.forEach(doc => {
+                const word = {
+                    id: doc.id,
+                    ...doc.data()
+                };
+                words.push(word);
                 
-                words = [];
-                wordsSnapshot.forEach(doc => {
-                    const word = {
-                        id: doc.id,
-                        ...doc.data()
-                    };
-                    words.push(word);
-                    
-                    // Format date
-                    const date = word.timestamp.toDate();
-                    const formattedDate = date.toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric', 
-                        year: 'numeric' 
-                    });
-                    
-                    // Create word card
-                    const wordCard = document.createElement('div');
-                    wordCard.className = 'word-card';
-                    wordCard.innerHTML = `
-                        <div class="word-header">
-                            <div class="word-text">${word.word}</div>
-                        </div>
-                        <div class="pronunciation">${word.pronunciation}</div>
-                        <div class="definition">${word.definition}</div>
-                        <div class="word-footer">
-                            <div>${formattedDate}</div>
-                            <div class="user-tag">${word.userName}</div>
-                        </div>
-                    `;
-                    
-                    // Add click event to show word details
-                    wordCard.addEventListener('click', () => {
-                        popupWord.textContent = word.word;
-                        popupPronunciation.textContent = word.pronunciation;
-                        popupDefinition.textContent = word.definition;
-                        popupUser.textContent = `Added by: ${word.userName}`;
-                        popupOverlay.classList.add('show');
-                    });
-                    
-                    wordsListContainer.appendChild(wordCard);
+                // Format date
+                const date = word.timestamp.toDate();
+                const formattedDate = date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    year: 'numeric' 
                 });
                 
-                // Update word count
-                wordCount.textContent = `${words.length} ${words.length === 1 ? 'word' : 'words'}`;
+                // Create word card
+                const wordCard = document.createElement('div');
+                wordCard.className = 'word-card';
+                wordCard.innerHTML = `
+                    <div class="word-header">
+                        <div class="word-text">${word.word}</div>
+                    </div>
+                    <div class="pronunciation">${word.pronunciation}</div>
+                    <div class="definition">${word.definition}</div>
+                    <div class="word-footer">
+                        <div>${formattedDate}</div>
+                        <div class="user-tag">${word.userName}</div>
+                    </div>
+                `;
                 
-                // Show empty state if no words
-                if (words.length === 0) {
-                    wordsListContainer.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-book-open"></i>
-                            <h3>Your Oculus is Empty</h3>
-                            <p>Add your first word to expand your writer's vocabulary</p>
-                        </div>
-                    `;
-                }
-                
-            } catch (error) {
-                console.error("Error loading words: ", error);
-                showNotification('Error', 'Failed to load vocabulary words', false);
-            }
-        }
-
-        // Start with selected user
-        startBtn.addEventListener('click', () => {
-            const activeCard = document.querySelector('.user-card.active');
-            if (activeCard) {
-                const userName = activeCard.querySelector('span').textContent;
-                const selectedUser = users.find(user => user.name === userName);
-                
-                if (selectedUser) {
-                    currentUser = selectedUser;
-                    currentUserName.textContent = currentUser.name;
-                    
-                    // Animate out the user selection
-                    userSelection.style.opacity = '0';
-                    userSelection.style.transform = 'translateY(-30px)';
-                    
-                    // After animation completes, show the app content
-                    setTimeout(() => {
-                        userSelection.classList.remove('show');
-                        appContent.classList.add('show');
-                        loadWords(); // Load all words for all users
-                    }, 800);
-                }
-            }
-        });
-
-        // Save word to central collection
-        wordForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const word = document.getElementById('word').value.trim();
-            const pronunciation = document.getElementById('pronunciation').value.trim();
-            const definition = document.getElementById('definition').value.trim();
-            
-            if (!word || !pronunciation || !definition) {
-                showNotification('Validation Error', 'Please fill all fields', false);
-                return;
-            }
-            
-            try {
-                // Create a loading effect on button
-                const btn = wordForm.querySelector('button');
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-                btn.disabled = true;
-                
-                // Add word to central collection with user info
-                await db.collection('words').add({
-                    word,
-                    pronunciation,
-                    definition,
-                    userId: currentUser.id,
-                    userName: currentUser.name,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                // Add click event to show word details
+                wordCard.addEventListener('click', () => {
+                    popupWord.textContent = word.word;
+                    popupPronunciation.textContent = word.pronunciation;
+                    popupDefinition.textContent = word.definition;
+                    popupUser.textContent = `Added by: ${word.userName}`;
+                    popupOverlay.classList.add('show');
                 });
                 
-                // Show success notification
-                showNotification('Word Added!', `"${word}" added to the shared oculus`);
-                
-                // Reset form
-                wordForm.reset();
-                
-                // Reload words
-                loadWords();
-                
-            } catch (error) {
-                console.error('Error adding word: ', error);
-                showNotification('Error', 'Failed to add word', false);
-            } finally {
-                // Reset button
-                const btn = wordForm.querySelector('button');
-                btn.innerHTML = '<i class="fas fa-feather"></i> Add to Oculus';
-                btn.disabled = false;
-                
-                // Collapse the form after adding
-                formToggle.classList.remove('expanded');
-                formToggle.classList.add('collapsed');
-                formContent.style.height = '0';
-            }
-        });
-
-        // Random word popup
-        randomWordBtn.addEventListener('click', () => {
-            if (words.length > 0) {
-                const randomIndex = Math.floor(Math.random() * words.length);
-                const randomWord = words[randomIndex];
-                
-                popupWord.textContent = randomWord.word;
-                popupPronunciation.textContent = randomWord.pronunciation;
-                popupDefinition.textContent = randomWord.definition;
-                popupUser.textContent = `Added by: ${randomWord.userName}`;
-                
-                popupOverlay.classList.add('show');
-            } else {
-                showNotification('No Words', 'Add some words to your oculus first', false);
-            }
-        });
-
-        // Close popup
-        closePopup.addEventListener('click', () => {
-            popupOverlay.classList.remove('show');
-        });
-
-        // Close popup when clicking outside
-        popupOverlay.addEventListener('click', (e) => {
-            if (e.target === popupOverlay) {
-                popupOverlay.classList.remove('show');
-            }
-        });
-
-        // Initialize the app
-        function init() {
-            // Check if app is already installed
-            isAppInstalled = checkIsAppInstalled();
-            if (isAppInstalled) {
-                console.log("App is already installed - hiding banner");
-                installBanner.style.display = "none";
+                wordsListContainer.appendChild(wordCard);
+            });
+            
+            // Update word count
+            wordCount.textContent = `${words.length} ${words.length === 1 ? 'word' : 'words'}`;
+            
+            // Show empty state if no words
+            if (words.length === 0) {
+                wordsListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-book-open"></i>
+                        <h3>Your Oculus is Empty</h3>
+                        <p>Add your first word to expand your writer's vocabulary</p>
+                    </div>
+                `;
             }
             
-            loadUsers();
+        } catch (error) {
+            console.error("Error loading words: ", error);
+            showNotification('Error', 'Failed to load vocabulary words', false);
+        }
+    }
+
+    // Start with selected user
+    startBtn.addEventListener('click', () => {
+        const activeCard = document.querySelector('.user-card.active');
+        if (activeCard) {
+            const userName = activeCard.querySelector('span').textContent;
+            const selectedUser = users.find(user => user.name === userName);
             
-            // Hide loading screen after 4 seconds
-            setTimeout(() => {
-                loadingScreen.style.opacity = '0';
+            if (selectedUser) {
+                currentUser = selectedUser;
+                currentUserName.textContent = currentUser.name;
+                
+                // Animate out the user selection
+                userSelection.style.opacity = '0';
+                userSelection.style.transform = 'translateY(-30px)';
+                
+                // After animation completes, show the app content
                 setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                    mainContainer.classList.add('show');
-                }, 500);
-            }, 4000);
-            
-            // Register service worker for PWA
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('Service Worker registered: ', registration);
-                    })
-                    .catch(error => {
-                        console.log('Service Worker registration failed: ', error);
-                    });
-                });
+                    userSelection.classList.remove('show');
+                    appContent.classList.add('show');
+                    loadWords(); // Load all words for all users
+                }, 800);
             }
         }
+    });
 
-        // Start the app
-        init();
-    </script>
+    // Save word to central collection
+    wordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const word = document.getElementById('word').value.trim();
+        const pronunciation = document.getElementById('pronunciation').value.trim();
+        const definition = document.getElementById('definition').value.trim();
+        
+        if (!word || !pronunciation || !definition) {
+            showNotification('Validation Error', 'Please fill all fields', false);
+            return;
+        }
+        
+        try {
+            // Create a loading effect on button
+            const btn = wordForm.querySelector('button');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+            btn.disabled = true;
+            
+            // Add word to central collection with user info
+            await db.collection('words').add({
+                word,
+                pronunciation,
+                definition,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Show success notification
+            showNotification('Word Added!', `"${word}" added to the shared oculus`);
+            
+            // Reset form
+            wordForm.reset();
+            
+            // Reload words
+            loadWords();
+            
+        } catch (error) {
+            console.error('Error adding word: ', error);
+            showNotification('Error', 'Failed to add word', false);
+        } finally {
+            // Reset button
+            const btn = wordForm.querySelector('button');
+            btn.innerHTML = '<i class="fas fa-feather"></i> Add to Oculus';
+            btn.disabled = false;
+            
+            // Collapse the form after adding
+            formToggle.classList.remove('expanded');
+            formToggle.classList.add('collapsed');
+            formContent.style.height = '0';
+        }
+    });
+
+    // Random word popup
+    randomWordBtn.addEventListener('click', () => {
+        if (words.length > 0) {
+            const randomIndex = Math.floor(Math.random() * words.length);
+            const randomWord = words[randomIndex];
+            
+            popupWord.textContent = randomWord.word;
+            popupPronunciation.textContent = randomWord.pronunciation;
+            popupDefinition.textContent = randomWord.definition;
+            popupUser.textContent = `Added by: ${randomWord.userName}`;
+            
+            popupOverlay.classList.add('show');
+        } else {
+            showNotification('No Words', 'Add some words to your oculus first', false);
+        }
+    });
+
+    // Close popup
+    closePopup.addEventListener('click', () => {
+        popupOverlay.classList.remove('show');
+    });
+
+    // Close popup when clicking outside
+    popupOverlay.addEventListener('click', (e) => {
+        if (e.target === popupOverlay) {
+            popupOverlay.classList.remove('show');
+        }
+    });
+
+    // Initialize the app
+    function init() {
+        loadUsers();
+        
+        // Hide loading screen after 4 seconds
+        setTimeout(() => {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                mainContainer.classList.add('show');
+            }, 500);
+        }, 4000);
+        
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('Service Worker registered: ', registration);
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed: ', error);
+                });
+            });
+        }
+    }
+
+    // Start the app
+    init();
+</script>
 </body>
 </html>

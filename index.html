@@ -9,7 +9,7 @@
     <meta name="msapplication-TileColor" content="#825e32">
     <title>Literary Oculus | Writer's Vocabulary Tracker</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <link rel="apple-touch-icon" href="/icons/favicon-192x192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Literary Oculus">
@@ -1215,7 +1215,6 @@
             appId: "721507977834"
         };
 
-
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -1252,6 +1251,7 @@
         let words = [];
         let users = [];
         let deferredPrompt = null;
+        let isAppInstalled = false;
 
         // PWA Install Prompt
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -1259,10 +1259,21 @@
             e.preventDefault();
             // Stash the event so it can be triggered later
             deferredPrompt = e;
-            // Show the install banner after 5 seconds
-            setTimeout(() => {
-                installBanner.classList.add('show');
-            }, 5000);
+            
+            // Only show the banner if app isn't already installed
+            if (!isAppInstalled) {
+                // Show the install banner after 5 seconds
+                setTimeout(() => {
+                    installBanner.classList.add('show');
+                }, 5000);
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('App installed');
+            isAppInstalled = true;
+            installBanner.classList.remove('show');
+            deferredPrompt = null;
         });
 
         installBtn.addEventListener('click', async () => {
@@ -1276,6 +1287,8 @@
             
             if (outcome === 'accepted') {
                 console.log('User accepted the install prompt');
+                // Set installed flag
+                isAppInstalled = true;
             } else {
                 console.log('User dismissed the install prompt');
             }
@@ -1293,7 +1306,7 @@
 
         // Show banner after 5 seconds if event didn't trigger
         setTimeout(() => {
-            if (!installBanner.classList.contains('show')) {
+            if (!installBanner.classList.contains('show') && !isAppInstalled) {
                 installBanner.classList.add('show');
             }
         }, 5000);

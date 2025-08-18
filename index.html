@@ -1177,7 +1177,7 @@
 
     <!-- Footer -->
     <footer>
-        Inspired by Antek made by O.G
+        Inspired by Antek | Made by O.G
     </footer>
 
     <!-- Notification -->
@@ -1215,7 +1215,6 @@
             appId: "721507977834"
         };
 
-
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -1252,18 +1251,48 @@
         let words = [];
         let users = [];
         let deferredPrompt = null;
+        let isAppInstalled = false;
+
+        // Check if app is running in standalone mode
+        function isRunningStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone ||
+                   document.referrer.includes('android-app://');
+        }
 
         // PWA Install Prompt
         window.addEventListener('beforeinstallprompt', (e) => {
             // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
+            
+            // Check if app is already installed
+            if (isRunningStandalone()) {
+                isAppInstalled = true;
+                return;
+            }
+            
             // Stash the event so it can be triggered later
             deferredPrompt = e;
-            // Show the install banner after 5 seconds
-            setTimeout(() => {
-                installBanner.classList.add('show');
-            }, 5000);
+            
+            // Check if user has previously dismissed the banner
+            const bannerDismissed = localStorage.getItem('pwaBannerDismissed');
+            const bannerDismissTime = localStorage.getItem('pwaBannerDismissTime');
+            const now = new Date().getTime();
+            const oneWeek = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
+            
+            // Show banner only if not dismissed recently
+            if (!bannerDismissed || (bannerDismissTime && (now - bannerDismissTime > oneWeek))) {
+                // Show the install banner after 5 seconds
+                setTimeout(() => {
+                    installBanner.classList.add('show');
+                }, 5000);
+            }
         });
+
+        // Check on page load if app is installed
+        if (isRunningStandalone()) {
+            isAppInstalled = true;
+        }
 
         installBtn.addEventListener('click', async () => {
             if (!deferredPrompt) return;
@@ -1276,12 +1305,13 @@
             
             if (outcome === 'accepted') {
                 console.log('User accepted the install prompt');
+                // Set flag that app is installed
+                isAppInstalled = true;
+                // Hide banner
+                installBanner.classList.remove('show');
             } else {
                 console.log('User dismissed the install prompt');
             }
-            
-            // Hide the install banner
-            installBanner.classList.remove('show');
             
             // Reset the deferred prompt variable
             deferredPrompt = null;
@@ -1289,12 +1319,23 @@
 
         dismissBtn.addEventListener('click', () => {
             installBanner.classList.remove('show');
+            // Store dismissal in localStorage
+            localStorage.setItem('pwaBannerDismissed', 'true');
+            localStorage.setItem('pwaBannerDismissTime', new Date().getTime());
         });
 
-        // Show banner after 5 seconds if event didn't trigger
+        // Show banner after 5 seconds if event didn't trigger and app not installed
         setTimeout(() => {
-            if (!installBanner.classList.contains('show')) {
-                installBanner.classList.add('show');
+            if (!isAppInstalled && !installBanner.classList.contains('show')) {
+                // Check if user has dismissed before
+                const bannerDismissed = localStorage.getItem('pwaBannerDismissed');
+                const bannerDismissTime = localStorage.getItem('pwaBannerDismissTime');
+                const now = new Date().getTime();
+                const oneWeek = 7 * 24 * 60 * 60 * 1000;
+                
+                if (!bannerDismissed || (bannerDismissTime && (now - bannerDismissTime > oneWeek))) {
+                    installBanner.classList.add('show');
+                }
             }
         }, 5000);
 
@@ -1607,7 +1648,7 @@
             // Register service worker for PWA
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js')
+                    navigator.serviceWorker.register('sw.js')
                     .then(registration => {
                         console.log('Service Worker registered: ', registration);
                     })

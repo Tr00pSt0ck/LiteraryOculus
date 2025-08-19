@@ -3,7 +3,7 @@
   "short_name": "LO",
   "description": "A Literary Oculus Progressive Web App",
   "start_url": "https://tr00pst0ck.github.io/LiteraryOculus/",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "portrait",
   "theme_color": "#825e32",
   "background_color": "#3e2c20",

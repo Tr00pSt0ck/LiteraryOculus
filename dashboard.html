@@ -99,7 +99,7 @@
             z-index: -1;
         }
 
-        /* Loading Screen - FIXED */
+        /* Loading Screen */
         #loading-screen {
             position: fixed;
             top: 0;
@@ -114,11 +114,6 @@
             z-index: 1000;
             transition: opacity 0.5s ease;
             text-align: center;
-        }
-
-        #loading-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
         }
 
         .ink-loading-container {
@@ -868,173 +863,73 @@
             width: 100%;
         }
 
-        /* PWA Install Banner - UPDATED to match SplashPaint style */
-        .pwa-banner {
+        /* PWA Install Banner */
+        #pwa-install-banner {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(to right, #8B4513, #A67C52);
-            color: white;
-            display: none;
+            background: var(--paper);
+            padding: 15px 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            z-index: 1001;
+            display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
-            z-index: 10000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transform: translateY(-100%);
-            transition: transform 0.5s ease;
-            flex-wrap: wrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+            border-bottom: 2px solid var(--accent);
         }
-        
-        .pwa-banner.show {
-            transform: translateY(0);
+
+        #pwa-install-banner.show {
+            opacity: 1;
+            visibility: visible;
         }
-        
-        .pwa-content {
+
+        #pwa-install-banner .banner-content {
             display: flex;
             align-items: center;
             gap: 15px;
-            font-size: 1.1rem;
-            font-weight: 500;
+            flex-grow: 1;
+            justify-content: center;
         }
-        
-        .pwa-content i {
-            font-size: 1.8rem;
-            color: #FFE66D;
+
+        #pwa-install-banner .banner-content i {
+            font-size: 1.5rem;
+            color: var(--primary);
         }
-        
-        .pwa-buttons {
+
+        #pwa-install-banner .banner-text {
+            font-size: 1rem;
+            color: var(--dark);
+            font-family: 'Crimson Text', serif;
+        }
+
+        #pwa-install-banner .banner-actions {
             display: flex;
             gap: 10px;
         }
-        
-        .pwa-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
+
+        #pwa-install-banner .banner-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .pwa-dismiss {
-            background: rgba(255,255,255,0.2);
-            color: white;
-        }
-        
-        .pwa-dismiss:hover {
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .pwa-install {
-            background: linear-gradient(to right, #FFE66D, #FFD166);
-            color: #182848;
-        }
-        
-        .pwa-install:hover {
-            background: linear-gradient(to right, #FFD166, #FFE66D);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
-        @media (max-width: 768px) {
-            .pwa-banner {
-                padding: 10px 15px;
-            }
-            .pwa-content {
-                font-size: 0.95rem;
-            }
-            .pwa-btn {
-                padding: 8px 15px;
-                font-size: 0.9rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .pwa-banner {
-                flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
-            }
-            .pwa-content {
-                justify-content: center;
-            }
-            .pwa-buttons {
-                justify-content: center;
-            }
-        }
-
-        /* iOS-specific instructions */
-        #ios-install-instructions {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--paper);
-            padding: 15px 20px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            z-index: 1002;
-            display: none;
-            max-width: 90%;
-            width: 400px;
-            text-align: center;
-            border: 2px solid var(--accent);
-        }
-
-        #ios-install-instructions.show {
-            display: block;
-            animation: fadeInUp 0.5s ease-out;
-        }
-
-        #ios-install-instructions .instructions-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        #ios-install-instructions .instructions-header h3 {
-            font-size: 1.2rem;
-            color: var(--dark);
+            transition: var(--transition);
             font-family: 'Playfair Display', serif;
         }
 
-        #ios-install-instructions .instructions-content {
-            font-size: 0.95rem;
-            line-height: 1.5;
-            color: var(--ink);
-            margin-bottom: 15px;
-        }
-
-        #ios-install-instructions .instructions-steps {
-            text-align: left;
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-
-        #ios-install-instructions .instructions-steps li {
-            margin-bottom: 8px;
-        }
-
-        #ios-install-instructions .close-instructions {
-            background: none;
+        #pwa-install-banner .install-btn {
+            background: var(--primary);
+            color: white;
             border: none;
-            font-size: 1.2rem;
-            color: var(--secondary);
-            cursor: pointer;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translate(-50%, 20px);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, 0);
-            }
+        #pwa-install-banner .dismiss-btn {
+            background: transparent;
+            color: var(--dark);
+            border: 1px solid var(--accent);
         }
 
         /* Responsive Design - Mobile First */
@@ -1075,20 +970,15 @@
             }
             
             /* Responsive banner */
-            .pwa-banner {
+            #pwa-install-banner {
                 flex-direction: column;
                 gap: 10px;
                 padding: 10px;
             }
             
-            .pwa-content {
+            #pwa-install-banner .banner-content {
                 flex-direction: column;
                 text-align: center;
-            }
-
-            #ios-install-instructions {
-                width: 90%;
-                padding: 12px 15px;
             }
         }
 
@@ -1187,33 +1077,15 @@
     </style>
 </head>
 <body>
-    <!-- PWA Install Banner - UPDATED to match SplashPaint style -->
-    <div id="pwa-banner" class="pwa-banner">
-        <div class="pwa-content">
+    <!-- PWA Install Banner -->
+    <div id="pwa-install-banner">
+        <div class="banner-content">
             <i class="fas fa-download"></i>
-            <div class="pwa-text">Install Literary Oculus for quick access</div>
+            <div class="banner-text">Install Literary Oculus for a better experience</div>
         </div>
-        <div class="pwa-buttons">
-            <button class="pwa-btn pwa-dismiss" id="dismiss-banner">Not Now</button>
-            <button class="pwa-btn pwa-install" id="install-pwa">Install</button>
-        </div>
-    </div>
-
-    <!-- iOS Install Instructions -->
-    <div id="ios-install-instructions">
-        <div class="instructions-header">
-            <h3>Install Literary Oculus</h3>
-            <button class="close-instructions" id="close-ios-instructions">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="instructions-content">
-            <p>To install this app on your iOS device:</p>
-            <ol class="instructions-steps">
-                <li>Tap the Share button <i class="fas fa-share-square"></i></li>
-                <li>Scroll down and select "Add to Home Screen"</li>
-                <li>Tap "Add" in the top right corner</li>
-            </ol>
+        <div class="banner-actions">
+            <button class="banner-btn dismiss-btn" id="dismiss-banner">Not Now</button>
+            <button class="banner-btn install-btn" id="install-pwa">Install</button>
         </div>
     </div>
     
@@ -1221,7 +1093,7 @@
     <div class="page-lines"></div>
     <div class="ink-blot"></div>
     
-    <!-- Loading Screen - FIXED -->
+    <!-- Loading Screen -->
     <div id="loading-screen">
         <div class="ink-loading-container">
             <div class="ink-blot-loading"></div>
@@ -1305,7 +1177,7 @@
 
     <!-- Footer -->
     <footer>
-        Inspired by Antek made by O.G
+        Inspired by Antek | Made by O.G
     </footer>
 
     <!-- Notification -->
@@ -1370,11 +1242,9 @@
         const popupUser = document.getElementById('popup-user');
         const formToggle = document.getElementById('form-toggle');
         const formContent = document.getElementById('form-content');
-        const pwaBanner = document.getElementById('pwa-banner');
+        const installBanner = document.getElementById('pwa-install-banner');
         const installBtn = document.getElementById('install-pwa');
         const dismissBtn = document.getElementById('dismiss-banner');
-        const iosInstructions = document.getElementById('ios-install-instructions');
-        const closeIosInstructions = document.getElementById('close-ios-instructions');
 
         // State
         let currentUser = null;
@@ -1383,149 +1253,91 @@
         let deferredPrompt = null;
         let isAppInstalled = false;
 
-        // Detect iOS
-        function isIos() {
-            return [
-                'iPad Simulator',
-                'iPhone Simulator',
-                'iPod Simulator',
-                'iPad',
-                'iPhone',
-                'iPod'
-            ].includes(navigator.platform) || 
-            (navigator.userAgent.includes("Mac") && "ontouchend" in document);
-        }
-
-        // Detect standalone mode
-        function isInStandaloneMode() {
-            return (window.matchMedia('(display-mode: standalone)').matches) || 
-                   (window.navigator.standalone) || 
-                   (document.referrer.includes('android-app://'));
-        }
-
-        // Check if the app is already installed
-        function checkIfAppInstalled() {
+        // Check if app is running in standalone mode
+        function isRunningStandalone() {
             return window.matchMedia('(display-mode: standalone)').matches || 
-                   (window.navigator.standalone) || 
+                   window.navigator.standalone ||
                    document.referrer.includes('android-app://');
         }
-        
-        // Enhanced PWA detection for all browsers
-        function checkPWAInstallable() {
-            // Check if app is already installed
-            if (checkIfAppInstalled()) {
-                return false;
-            }
-            
-            // Check if the beforeinstallprompt event is supported
-            const isBeforeInstallPromptSupported = 'onbeforeinstallprompt' in window;
-            
-            // Check if it's iOS (which handles PWA differently)
-            const isIOS = isIos();
-            
-            // Check session storage for dismissal
-            const isDismissed = sessionStorage.getItem('pwaDismissed') === 'true';
-            
-            return (isBeforeInstallPromptSupported || isIOS) && !isDismissed;
-        }
-        
-        // PWA Banner Logic
-        function showPwaBanner() {
-            if (!checkPWAInstallable()) return;
-            
-            // Calculate and set body padding
-            pwaBanner.style.display = 'flex';
-            const bannerHeight = pwaBanner.offsetHeight;
-            document.body.style.paddingTop = `${bannerHeight}px`;
-            
-            // Show banner with animation
-            setTimeout(() => {
-                pwaBanner.classList.add('show');
-            }, 50);
-        }
-        
-        // Before Install Prompt
+
+        // PWA Install Prompt
         window.addEventListener('beforeinstallprompt', (e) => {
             // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
-            // Store the event for later use
+            
+            // Check if app is already installed
+            if (isRunningStandalone()) {
+                isAppInstalled = true;
+                return;
+            }
+            
+            // Stash the event so it can be triggered later
             deferredPrompt = e;
-            // Show our banner
-            showPwaBanner();
-        });
-        
-        // Check if we should show the banner on iOS
-        function checkIOSPWA() {
-            if (isIos()) {
-                // Show iOS-specific instructions after a delay
+            
+            // Check if user has previously dismissed the banner
+            const bannerDismissed = localStorage.getItem('pwaBannerDismissed');
+            const bannerDismissTime = localStorage.getItem('pwaBannerDismissTime');
+            const now = new Date().getTime();
+            const oneWeek = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
+            
+            // Show banner only if not dismissed recently
+            if (!bannerDismissed || (bannerDismissTime && (now - bannerDismissTime > oneWeek))) {
+                // Show the install banner after 5 seconds
                 setTimeout(() => {
-                    if (checkPWAInstallable()) {
-                        const pwaText = document.querySelector('.pwa-text');
-                        if (pwaText) {
-                            pwaText.textContent = "Add this app to your home screen for quick access";
-                        }
-                        showPwaBanner();
-                    }
-                }, 3000);
+                    installBanner.classList.add('show');
+                }, 5000);
             }
+        });
+
+        // Check on page load if app is installed
+        if (isRunningStandalone()) {
+            isAppInstalled = true;
         }
-        
-        // Run iOS check
-        checkIOSPWA();
-        
-        // Install Button
+
         installBtn.addEventListener('click', async () => {
-            // Hide the banner
-            pwaBanner.classList.remove('show');
-            setTimeout(() => {
-                pwaBanner.style.display = 'none';
-                document.body.style.paddingTop = '20px';
-            }, 500);
+            if (!deferredPrompt) return;
             
-            // Check if we're on iOS
-            if (isIos()) {
-                // Show iOS-specific instructions
-                showNotification('Install Instructions', 'Tap the share icon and select "Add to Home Screen"', true);
-            } else if (deferredPrompt) {
-                // Show the install prompt for non-iOS devices
-                deferredPrompt.prompt();
-                
-                // Wait for the user to respond to the prompt
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    showNotification('Success', 'App installed successfully!', true);
-                } else {
-                    showNotification('Info', 'App installation cancelled', true);
-                }
-                deferredPrompt = null;
+            // Show the install prompt
+            deferredPrompt.prompt();
+            
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+                // Set flag that app is installed
+                isAppInstalled = true;
+                // Hide banner
+                installBanner.classList.remove('show');
+            } else {
+                console.log('User dismissed the install prompt');
             }
-        });
-        
-        // Dismiss Button
-        dismissBtn.addEventListener('click', () => {
-            // Hide banner with animation
-            pwaBanner.classList.remove('show');
-            setTimeout(() => {
-                pwaBanner.style.display = 'none';
-                document.body.style.paddingTop = '20px';
-            }, 500);
             
-            // Remember dismissal for this session
-            sessionStorage.setItem('pwaDismissed', 'true');
-            showNotification('Info', 'Banner dismissed for this session', true);
-        });
-        
-        // App Installed Event
-        window.addEventListener('appinstalled', () => {
-            // Hide the banner if it's visible
-            pwaBanner.classList.remove('show');
-            pwaBanner.style.display = 'none';
-            document.body.style.paddingTop = '20px';
-            
-            // Clear session storage flag
-            sessionStorage.removeItem('pwaDismissed');
+            // Reset the deferred prompt variable
             deferredPrompt = null;
         });
+
+        dismissBtn.addEventListener('click', () => {
+            installBanner.classList.remove('show');
+            // Store dismissal in localStorage
+            localStorage.setItem('pwaBannerDismissed', 'true');
+            localStorage.setItem('pwaBannerDismissTime', new Date().getTime());
+        });
+
+        // Show banner after 5 seconds if event didn't trigger and app not installed
+        setTimeout(() => {
+            if (!isAppInstalled && !installBanner.classList.contains('show')) {
+                // Check if user has dismissed before
+                const bannerDismissed = localStorage.getItem('pwaBannerDismissed');
+                const bannerDismissTime = localStorage.getItem('pwaBannerDismissTime');
+                const now = new Date().getTime();
+                const oneWeek = 7 * 24 * 60 * 60 * 1000;
+                
+                if (!bannerDismissed || (bannerDismissTime && (now - bannerDismissTime > oneWeek))) {
+                    installBanner.classList.add('show');
+                }
+            }
+        }, 5000);
 
         // Collapsible form functionality
         formToggle.addEventListener('click', () => {
@@ -1824,9 +1636,9 @@
         function init() {
             loadUsers();
             
-            // Hide loading screen after data is loaded or 4 seconds, whichever comes first
+            // Hide loading screen after 4 seconds
             setTimeout(() => {
-                loadingScreen.classList.add('hidden');
+                loadingScreen.style.opacity = '0';
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
                     mainContainer.classList.add('show');
@@ -1836,7 +1648,7 @@
             // Register service worker for PWA
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js')
+                    navigator.serviceWorker.register('sw.js')
                     .then(registration => {
                         console.log('Service Worker registered: ', registration);
                     })

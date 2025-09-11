@@ -208,7 +208,7 @@
                 opacity: 0.9;
             }
             50% {
-                transform: translate(-50%, -30%) rotate(-20deg);
+                transform: translate(-50%, -50%) rotate(-20deg);
                 opacity: 1;
             }
         }
@@ -616,7 +616,9 @@
         .word-header {
             display: flex;
             justify-content: center;
+            align-items: center;
             margin-bottom: 15px;
+            gap: 10px;
         }
 
         .word-text {
@@ -625,6 +627,10 @@
             color: var(--primary);
             font-family: 'Playfair Display', serif;
             text-align: center;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            max-width: 100%;
         }
 
         .pronunciation {
@@ -633,6 +639,8 @@
             margin: 10px 0;
             font-size: 1.1rem;
             text-align: center;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .definition {
@@ -641,6 +649,9 @@
             font-size: 1.1rem;
             color: var(--ink);
             text-align: center;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         .word-footer {
@@ -660,6 +671,28 @@
             font-weight: 600;
             color: var(--primary);
             font-family: 'Playfair Display', serif;
+        }
+
+        /* Speaker Button */
+        .speaker-btn {
+            background: transparent;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+            padding: 5px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .speaker-btn:hover {
+            color: var(--primary);
+            background: rgba(139, 69, 19, 0.1);
         }
 
         /* Notification */
@@ -782,11 +815,21 @@
             text-align: center;
         }
 
+        .popup-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
         .popup-word {
             font-size: 2.5rem;
             color: var(--primary);
             font-family: 'Playfair Display', serif;
-            margin-bottom: 10px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         .popup-pronunciation {
@@ -794,6 +837,8 @@
             color: var(--secondary);
             font-style: italic;
             margin-bottom: 20px;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .popup-definition {
@@ -805,6 +850,9 @@
             max-width: 100%;
             margin-left: auto;
             margin-right: auto;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         .popup-user {
@@ -897,6 +945,7 @@
             gap: 15px;
             font-size: 1.1rem;
             font-weight: 500;
+            flex: 1;
         }
         
         .pwa-content i {
@@ -1090,6 +1139,15 @@
                 width: 90%;
                 padding: 12px 15px;
             }
+            
+            .popup-word {
+                font-size: 2rem;
+            }
+            
+            .popup-header {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
 
         @media (max-width: 550px) {
@@ -1121,6 +1179,18 @@
             
             .loading-text {
                 font-size: 1.8rem;
+            }
+            
+            .word-text {
+                font-size: 1.5rem;
+            }
+            
+            .popup-word {
+                font-size: 1.8rem;
+            }
+            
+            .popup-definition {
+                font-size: 1.1rem;
             }
         }
 
@@ -1168,6 +1238,10 @@
             
             .loading-text {
                 font-size: 1.5rem;
+            }
+            
+            .word-header {
+                flex-direction: column;
             }
         }
         
@@ -1324,7 +1398,12 @@
                 <i class="fas fa-times"></i>
             </button>
             <div class="popup-content">
-                <div class="popup-word" id="popup-word"></div>
+                <div class="popup-header">
+                    <div class="popup-word" id="popup-word"></div>
+                    <button class="speaker-btn" id="popup-speaker-btn">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
                 <div class="popup-pronunciation" id="popup-pronunciation"></div>
                 <div class="popup-definition" id="popup-definition"></div>
                 <div class="popup-user" id="popup-user"></div>
@@ -1368,6 +1447,7 @@
         const popupPronunciation = document.getElementById('popup-pronunciation');
         const popupDefinition = document.getElementById('popup-definition');
         const popupUser = document.getElementById('popup-user');
+        const popupSpeakerBtn = document.getElementById('popup-speaker-btn');
         const formToggle = document.getElementById('form-toggle');
         const formContent = document.getElementById('form-content');
         const pwaBanner = document.getElementById('pwa-banner');
@@ -1382,6 +1462,7 @@
         let users = [];
         let deferredPrompt = null;
         let isAppInstalled = false;
+        let speechSynthesis = window.speechSynthesis;
 
         // Detect iOS
         function isIos() {
@@ -1560,6 +1641,35 @@
             }, 3500);
         }
 
+        // Text-to-speech function
+        function speakText(text) {
+            if (speechSynthesis) {
+                // Cancel any ongoing speech
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Set voice properties
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                utterance.volume = 1;
+                
+                // Find a suitable voice
+                const voices = speechSynthesis.getVoices();
+                const englishVoice = voices.find(voice => 
+                    voice.lang.startsWith('en') && voice.localService === true
+                );
+                
+                if (englishVoice) {
+                    utterance.voice = englishVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                showNotification('Error', 'Text-to-speech not supported in your browser', false);
+            }
+        }
+
         // Load user profiles from Firestore
         async function loadUsers() {
             try {
@@ -1671,6 +1781,9 @@
                     wordCard.innerHTML = `
                         <div class="word-header">
                             <div class="word-text">${word.word}</div>
+                            <button class="speaker-btn" data-word="${word.word}" data-definition="${word.definition}">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
                         </div>
                         <div class="pronunciation">${word.pronunciation}</div>
                         <div class="definition">${word.definition}</div>
@@ -1681,12 +1794,24 @@
                     `;
                     
                     // Add click event to show word details
-                    wordCard.addEventListener('click', () => {
-                        popupWord.textContent = word.word;
-                        popupPronunciation.textContent = word.pronunciation;
-                        popupDefinition.textContent = word.definition;
-                        popupUser.textContent = `Added by: ${word.userName}`;
-                        popupOverlay.classList.add('show');
+                    wordCard.addEventListener('click', (e) => {
+                        // Don't trigger if clicking the speaker button
+                        if (!e.target.closest('.speaker-btn')) {
+                            popupWord.textContent = word.word;
+                            popupPronunciation.textContent = word.pronunciation;
+                            popupDefinition.textContent = word.definition;
+                            popupUser.textContent = `Added by: ${word.userName}`;
+                            popupOverlay.classList.add('show');
+                        }
+                    });
+                    
+                    // Add event listener to speaker button
+                    const speakerBtn = wordCard.querySelector('.speaker-btn');
+                    speakerBtn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent triggering the card click event
+                        const wordText = speakerBtn.getAttribute('data-word');
+                        const definition = speakerBtn.getAttribute('data-definition');
+                        speakText(`${wordText}. ${definition}`);
                     });
                     
                     wordsListContainer.appendChild(wordCard);
@@ -1811,6 +1936,13 @@
         // Close popup
         closePopup.addEventListener('click', () => {
             popupOverlay.classList.remove('show');
+        });
+
+        // Popup speaker button
+        popupSpeakerBtn.addEventListener('click', () => {
+            const word = popupWord.textContent;
+            const definition = popupDefinition.textContent;
+            speakText(`${word}. ${definition}`);
         });
 
         // Close popup when clicking outside

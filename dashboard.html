@@ -99,7 +99,7 @@
             z-index: -1;
         }
 
-        /* Loading Screen - FIXED */
+        /* Loading Screen - FIXED: Feather centered */
         #loading-screen {
             position: fixed;
             top: 0;
@@ -152,6 +152,9 @@
             animation: quill-dip 2s ease-in-out infinite;
             opacity: 0;
             animation-delay: 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .loading-text {
@@ -662,6 +665,7 @@
             padding-top: 15px;
             color: var(--secondary);
             font-size: 0.95rem;
+            flex-wrap: wrap;
         }
 
         .user-tag {
@@ -671,6 +675,190 @@
             font-weight: 600;
             color: var(--primary);
             font-family: 'Playfair Display', serif;
+        }
+
+        /* UPDATED REACTIONS STYLES - Count in bottom right of circle */
+        .reactions-container {
+            position: relative;
+            margin: 10px 0 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 40px;
+        }
+
+        .reaction {
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.2rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(193, 154, 107, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            border: 2px solid transparent;
+        }
+
+        .reaction:hover, .reaction.active {
+            background: rgba(139, 69, 19, 0.2);
+            transform: translateY(-2px);
+            border-color: rgba(139, 69, 19, 0.3);
+        }
+
+        .reaction-count {
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        .reaction-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            pointer-events: none;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .reaction-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: var(--dark) transparent transparent transparent;
+        }
+
+        .reaction:hover .reaction-tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: calc(100% + 10px);
+        }
+
+        /* Add Reaction Button */
+        .add-reaction {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(139, 69, 19, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.5rem;
+            color: var(--primary);
+            border: 2px dashed rgba(139, 69, 19, 0.3);
+            position: relative;
+        }
+
+        .add-reaction:hover, .add-reaction:active {
+            background: rgba(139, 69, 19, 0.2);
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .add-reaction .reaction-tooltip {
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        /* Reaction Dropdown */
+        .reaction-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            z-index: 200;
+            display: none;
+            gap: 8px;
+            border: 1px solid rgba(139, 69, 19, 0.2);
+            flex-wrap: wrap;
+            width: 200px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .reaction-dropdown.show {
+            display: flex;
+            animation: fadeInUp 0.2s ease-out;
+        }
+
+        .reaction-option {
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 50%;
+            transition: var(--transition);
+            background: none;
+            border: none;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .reaction-option:hover {
+            background: rgba(139, 69, 19, 0.1);
+            transform: scale(1.2);
+        }
+
+        .reaction-option.active {
+            background: rgba(139, 69, 19, 0.2);
+            transform: scale(1.1);
+            border: 2px solid var(--primary);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 10px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
         }
 
         /* Speaker Button */
@@ -1075,17 +1263,6 @@
             cursor: pointer;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translate(-50%, 20px);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, 0);
-            }
-        }
-
         /* Responsive Design - Mobile First */
         @media (max-width: 900px) {
             .words-grid {
@@ -1148,6 +1325,37 @@
                 flex-direction: column;
                 gap: 10px;
             }
+            
+            .word-footer {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+            
+            .reaction-dropdown {
+                width: 180px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .reaction-option {
+                width: 40px;
+                height: 40px;
+                font-size: 1.6rem;
+            }
+            
+            .reaction, .add-reaction {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .reaction-count {
+                width: 18px;
+                height: 18px;
+                font-size: 0.65rem;
+                bottom: -5px;
+                right: -5px;
+            }
         }
 
         @media (max-width: 550px) {
@@ -1191,6 +1399,30 @@
             
             .popup-definition {
                 font-size: 1.1rem;
+            }
+            
+            .reaction-dropdown {
+                width: 160px;
+                padding: 10px;
+            }
+            
+            .reaction-option {
+                width: 36px;
+                height: 36px;
+                font-size: 1.5rem;
+            }
+            
+            .reaction, .add-reaction {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .reaction-count {
+                width: 16px;
+                height: 16px;
+                font-size: 0.6rem;
+                bottom: -4px;
+                right: -4px;
             }
         }
 
@@ -1242,6 +1474,30 @@
             
             .word-header {
                 flex-direction: column;
+            }
+            
+            .reaction-dropdown {
+                width: 140px;
+            }
+            
+            .reaction-option {
+                width: 32px;
+                height: 32px;
+                font-size: 1.4rem;
+            }
+            
+            .reaction, .add-reaction {
+                width: 32px;
+                height: 32px;
+                font-size: 1.1rem;
+            }
+            
+            .reaction-count {
+                width: 14px;
+                height: 14px;
+                font-size: 0.55rem;
+                bottom: -3px;
+                right: -3px;
             }
         }
         
@@ -1295,7 +1551,7 @@
     <div class="page-lines"></div>
     <div class="ink-blot"></div>
     
-    <!-- Loading Screen - FIXED -->
+    <!-- Loading Screen - FIXED: Feather centered -->
     <div id="loading-screen">
         <div class="ink-loading-container">
             <div class="ink-blot-loading"></div>
@@ -1463,6 +1719,7 @@
         let deferredPrompt = null;
         let isAppInstalled = false;
         let speechSynthesis = window.speechSynthesis;
+        const emojiOptions = ['❤️', '💥', '🤯', '👍', '⭐'];
 
         // Detect iOS
         function isIos() {
@@ -1751,85 +2008,294 @@
             });
         }
 
-        // Load all words from central collection
-        async function loadWords() {
-            try {
-                wordsListContainer.innerHTML = '';
-                const wordsSnapshot = await db.collection('words')
-                    .orderBy('timestamp', 'desc')
-                    .get();
+        // Render reactions for a word
+        function renderReactions(word, wordCard) {
+            const reactionsContainer = wordCard.querySelector('.reactions-container');
+            if (!reactionsContainer) return;
+            
+            reactionsContainer.innerHTML = '';
+            
+            // Group reactions by emoji and count
+            const reactionCounts = {};
+            const reactionUsers = {};
+            
+            if (word.reactions) {
+                Object.entries(word.reactions).forEach(([userId, emoji]) => {
+                    if (!reactionCounts[emoji]) {
+                        reactionCounts[emoji] = 0;
+                        reactionUsers[emoji] = [];
+                    }
+                    reactionCounts[emoji]++;
+                    
+                    // Find user name
+                    const user = users.find(u => u.id === userId);
+                    if (user) {
+                        reactionUsers[emoji].push(user.name);
+                    }
+                });
+            }
+            
+            // Create reaction elements for each emoji
+            Object.keys(reactionCounts).forEach(emoji => {
+                const reactionDiv = document.createElement('div');
+                reactionDiv.className = 'reaction';
+                if (currentUser && word.reactions && word.reactions[currentUser.id] === emoji) {
+                    reactionDiv.classList.add('active');
+                }
+                reactionDiv.dataset.emoji = emoji;
                 
-                words = [];
-                wordsSnapshot.forEach(doc => {
-                    const word = {
-                        id: doc.id,
-                        ...doc.data()
-                    };
-                    words.push(word);
-                    
-                    // Format date
-                    const date = word.timestamp.toDate();
-                    const formattedDate = date.toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric', 
-                        year: 'numeric' 
-                    });
-                    
-                    // Create word card
-                    const wordCard = document.createElement('div');
-                    wordCard.className = 'word-card';
-                    wordCard.innerHTML = `
-                        <div class="word-header">
-                            <div class="word-text">${word.word}</div>
-                            <button class="speaker-btn" data-word="${word.word}" data-definition="${word.definition}">
-                                <i class="fas fa-volume-up"></i>
-                            </button>
-                        </div>
-                        <div class="pronunciation">${word.pronunciation}</div>
-                        <div class="definition">${word.definition}</div>
-                        <div class="word-footer">
-                            <div>${formattedDate}</div>
-                            <div class="user-tag">${word.userName}</div>
-                        </div>
-                    `;
-                    
-                    // Add click event to show word details
-                    wordCard.addEventListener('click', (e) => {
-                        // Don't trigger if clicking the speaker button
-                        if (!e.target.closest('.speaker-btn')) {
-                            popupWord.textContent = word.word;
-                            popupPronunciation.textContent = word.pronunciation;
-                            popupDefinition.textContent = word.definition;
-                            popupUser.textContent = `Added by: ${word.userName}`;
-                            popupOverlay.classList.add('show');
-                        }
-                    });
-                    
-                    // Add event listener to speaker button
-                    const speakerBtn = wordCard.querySelector('.speaker-btn');
-                    speakerBtn.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Prevent triggering the card click event
-                        const wordText = speakerBtn.getAttribute('data-word');
-                        const definition = speakerBtn.getAttribute('data-definition');
-                        speakText(`${wordText}. ${definition}`);
-                    });
-                    
-                    wordsListContainer.appendChild(wordCard);
+                // Create tooltip text
+                const tooltipText = reactionUsers[emoji].join(', ') || 'No users';
+                
+                reactionDiv.innerHTML = `
+                    <span class="emoji">${emoji}</span>
+                    <span class="reaction-count">${reactionCounts[emoji]}</span>
+                    <div class="reaction-tooltip">
+                        ${tooltipText}
+                    </div>
+                `;
+                
+                // Add click event to remove reaction if already reacted
+                reactionDiv.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (currentUser) {
+                        toggleReaction(word.id, emoji);
+                    } else {
+                        showNotification('Error', 'Please select a writer profile first', false);
+                    }
                 });
                 
-                // Update word count
-                wordCount.textContent = `${words.length} ${words.length === 1 ? 'word' : 'words'}`;
+                reactionsContainer.appendChild(reactionDiv);
+            });
+            
+            // Add "Add Reaction" button if user hasn't reacted or no reactions exist
+            if (!currentUser || !word.reactions || !word.reactions[currentUser.id]) {
+                const addReactionBtn = document.createElement('div');
+                addReactionBtn.className = 'add-reaction';
+                addReactionBtn.innerHTML = `
+                    <span>+</span>
+                    <div class="reaction-tooltip">Tap to add reaction</div>
+                `;
                 
-                // Show empty state if no words
-                if (words.length === 0) {
-                    wordsListContainer.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-book-open"></i>
-                            <h3>Your Oculus is Empty</h3>
-                            <p>Add your first word to expand your writer's vocabulary</p>
-                        </div>
-                    `;
+                // Touch/Mouse events for reaction dropdown
+                let longPressTimer;
+                let isLongPress = false;
+                
+                addReactionBtn.addEventListener('mousedown', startLongPress);
+                addReactionBtn.addEventListener('touchstart', startLongPress);
+                
+                addReactionBtn.addEventListener('mouseup', cancelLongPress);
+                addReactionBtn.addEventListener('touchend', cancelLongPress);
+                addReactionBtn.addEventListener('mouseleave', cancelLongPress);
+                
+                function startLongPress(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    isLongPress = false;
+                    longPressTimer = setTimeout(() => {
+                        isLongPress = true;
+                        showReactionDropdown(word.id, addReactionBtn);
+                    }, 500); // 500ms for long press
                 }
+                
+                function cancelLongPress() {
+                    clearTimeout(longPressTimer);
+                    if (!isLongPress) {
+                        // If it was a short tap, show dropdown anyway
+                        showReactionDropdown(word.id, addReactionBtn);
+                    }
+                }
+                
+                // Also respond to click for better accessibility
+                addReactionBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showReactionDropdown(word.id, addReactionBtn);
+                });
+                
+                reactionsContainer.appendChild(addReactionBtn);
+            }
+        }
+
+        // Show reaction dropdown
+        function showReactionDropdown(wordId, button) {
+            // Close any open dropdowns
+            document.querySelectorAll('.reaction-dropdown').forEach(d => d.remove());
+            
+            // Create dropdown
+            const dropdown = document.createElement('div');
+            dropdown.className = 'reaction-dropdown show';
+            
+            // Get word reactions to highlight current user's reaction
+            const word = words.find(w => w.id === wordId);
+            const currentUserReaction = word && word.reactions && currentUser ? word.reactions[currentUser.id] : null;
+            
+            emojiOptions.forEach(emoji => {
+                const option = document.createElement('button');
+                option.className = 'reaction-option';
+                if (emoji === currentUserReaction) {
+                    option.classList.add('active');
+                }
+                option.textContent = emoji;
+                option.dataset.emoji = emoji;
+                
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleReaction(wordId, emoji);
+                    dropdown.remove();
+                });
+                
+                dropdown.appendChild(option);
+            });
+            
+            // Position dropdown
+            const rect = button.getBoundingClientRect();
+            dropdown.style.position = 'fixed';
+            dropdown.style.left = `${rect.left + rect.width/2}px`;
+            dropdown.style.transform = 'translateX(-50%)';
+            dropdown.style.bottom = `${window.innerHeight - rect.top + 10}px`;
+            
+            document.body.appendChild(dropdown);
+            
+            // Close dropdown when clicking outside
+            function closeDropdown(e) {
+                if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+                    dropdown.remove();
+                    document.removeEventListener('click', closeDropdown);
+                    document.removeEventListener('touchstart', closeDropdown);
+                }
+            }
+            
+            setTimeout(() => {
+                document.addEventListener('click', closeDropdown);
+                document.addEventListener('touchstart', closeDropdown);
+            }, 10);
+        }
+
+        // Toggle reaction for a word
+        async function toggleReaction(wordId, emoji) {
+            if (!currentUser) {
+                showNotification('Error', 'Please select a writer profile first', false);
+                return;
+            }
+            
+            try {
+                const wordRef = db.collection('words').doc(wordId);
+                const wordDoc = await wordRef.get();
+                const wordData = wordDoc.data();
+                
+                // Initialize reactions object if it doesn't exist
+                const reactions = wordData.reactions || {};
+                
+                // Check if user already reacted with this emoji
+                if (reactions[currentUser.id] === emoji) {
+                    // Remove reaction
+                    delete reactions[currentUser.id];
+                    showNotification('Reaction Removed', `Removed ${emoji} reaction`, true);
+                } else {
+                    // Add or change reaction
+                    reactions[currentUser.id] = emoji;
+                    showNotification('Reaction Added', `Added ${emoji} reaction`, true);
+                }
+                
+                // Update in Firebase
+                await wordRef.update({ reactions });
+                
+            } catch (error) {
+                console.error('Error updating reaction: ', error);
+                showNotification('Error', 'Failed to update reaction', false);
+            }
+        }
+
+        // Load all words from central collection with real-time updates
+        function loadWords() {
+            try {
+                // Set up real-time listener
+                db.collection('words')
+                    .orderBy('timestamp', 'desc')
+                    .onSnapshot((snapshot) => {
+                        words = [];
+                        wordsListContainer.innerHTML = '';
+                        
+                        snapshot.forEach(doc => {
+                            const word = {
+                                id: doc.id,
+                                ...doc.data()
+                            };
+                            words.push(word);
+                            
+                            // Format date
+                            const date = word.timestamp.toDate();
+                            const formattedDate = date.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                            });
+                            
+                            // Create word card
+                            const wordCard = document.createElement('div');
+                            wordCard.className = 'word-card';
+                            wordCard.innerHTML = `
+                                <div class="word-header">
+                                    <div class="word-text">${word.word}</div>
+                                    <button class="speaker-btn" data-word="${word.word}" data-definition="${word.definition}">
+                                        <i class="fas fa-volume-up"></i>
+                                    </button>
+                                </div>
+                                <div class="pronunciation">${word.pronunciation}</div>
+                                <div class="definition">${word.definition}</div>
+                                <div class="reactions-container">
+                                    <!-- Reactions will be rendered here -->
+                                </div>
+                                <div class="word-footer">
+                                    <div>${formattedDate}</div>
+                                    <div class="user-tag">${word.userName}</div>
+                                </div>
+                            `;
+                            
+                            // Render reactions
+                            renderReactions(word, wordCard);
+                            
+                            // Add click event to show word details
+                            wordCard.addEventListener('click', (e) => {
+                                // Don't trigger if clicking the speaker button or reaction
+                                if (!e.target.closest('.speaker-btn') && !e.target.closest('.reaction') && !e.target.closest('.add-reaction')) {
+                                    popupWord.textContent = word.word;
+                                    popupPronunciation.textContent = word.pronunciation;
+                                    popupDefinition.textContent = word.definition;
+                                    popupUser.textContent = `Added by: ${word.userName}`;
+                                    popupOverlay.classList.add('show');
+                                }
+                            });
+                            
+                            // Add event listener to speaker button
+                            const speakerBtn = wordCard.querySelector('.speaker-btn');
+                            speakerBtn.addEventListener('click', (e) => {
+                                e.stopPropagation(); // Prevent triggering the card click event
+                                const wordText = speakerBtn.getAttribute('data-word');
+                                const definition = speakerBtn.getAttribute('data-definition');
+                                speakText(`${wordText}. ${definition}`);
+                            });
+                            
+                            wordsListContainer.appendChild(wordCard);
+                        });
+                        
+                        // Update word count
+                        wordCount.textContent = `${words.length} ${words.length === 1 ? 'word' : 'words'}`;
+                        
+                        // Show empty state if no words
+                        if (words.length === 0) {
+                            wordsListContainer.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fas fa-book-open"></i>
+                                    <h3>Your Oculus is Empty</h3>
+                                    <p>Add your first word to expand your writer's vocabulary</p>
+                                </div>
+                            `;
+                        }
+                    }, (error) => {
+                        console.error("Error loading words: ", error);
+                        showNotification('Error', 'Failed to load vocabulary words', false);
+                    });
                 
             } catch (error) {
                 console.error("Error loading words: ", error);
@@ -1888,6 +2354,7 @@
                     definition,
                     userId: currentUser.id,
                     userName: currentUser.name,
+                    reactions: {}, // Initialize empty reactions object
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
@@ -1897,8 +2364,7 @@
                 // Reset form
                 wordForm.reset();
                 
-                // Reload words
-                loadWords();
+                // Reload words will happen automatically via real-time listener
                 
             } catch (error) {
                 console.error('Error adding word: ', error);

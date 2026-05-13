@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0a0a0f">
+    <meta name="theme-color" content="#8B4513">
     <meta name="description" content="Literary Oculus - Expand your writer's vocabulary">
-    <meta name="msapplication-TileColor" content="#0a0a0f">
+    <meta name="msapplication-TileImage" content="/icons/favicon-144x144.png">
+    <meta name="msapplication-TileColor" content="#825e32">
     <title>Literary Oculus | Writer's Vocabulary Tracker</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="/icons/favicon-192x192.png">
@@ -15,763 +16,1508 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;0,6..96,900;1,6..96,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after {
-            margin: 0; padding: 0;
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
 
         :root {
-            --void: #050508;
-            --ink: #0d0d14;
-            --paper: #12121c;
-            --surface: #1a1a28;
-            --raised: #20202f;
-            --hover: #252538;
-            --gold: #c9a84c;
-            --gold-dim: #8a6e30;
-            --gold-glow: rgba(201,168,76,0.12);
-            --cream: #e8dfc8;
-            --muted: #5e5e7a;
-            --text: #c8c3b8;
-            --white: #ede9dc;
-            --red: #b84848;
-            --green: #3d8a5e;
-            --r: 12px;
-            --t: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            --primary: #8B4513;
+            --secondary: #A67C52;
+            --accent: #C19A6B;
+            --light: #F5F1E6;
+            --dark: #3E2723;
+            --paper: #FFF8E1;
+            --ink: #3E2723;
+            --success: #4CAF50;
+            --error: #F44336;
+            --border-radius: 8px;
+            --transition: all 0.4s ease;
         }
 
-        html { scroll-behavior: smooth; }
-
         body {
-            background: var(--void);
+            background: linear-gradient(-45deg, #f5f1e6, #e8e0d1, #d9d0c1, #c9c0b1);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 24px 20px;
-            color: var(--text);
-            font-family: 'Cormorant Garamond', serif;
+            padding: 20px;
+            color: var(--ink);
+            font-family: 'Crimson Text', serif;
             position: relative;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            text-align: center;
         }
 
-        /* Ambient background layers */
-        body::before {
-            content: '';
-            position: fixed; inset: 0;
-            background:
-                radial-gradient(ellipse 70% 50% at 15% 5%,  rgba(201,168,76,0.055) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 70% at 85% 95%, rgba(90,60,140,0.07) 0%, transparent 60%),
-                repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(201,168,76,0.02) 80px),
-                repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(201,168,76,0.012) 80px);
-            pointer-events: none; z-index: 0;
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* Grain */
-        body::after {
-            content: '';
-            position: fixed; inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-            opacity: 0.35; pointer-events: none; z-index: 0;
+        /* Page Decorative Elements */
+        .page-corner {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            border-top: 2px solid var(--accent);
+            border-right: 2px solid var(--accent);
         }
 
-        /* ─── Loading Screen ─── */
+        .page-lines {
+            position: absolute;
+            top: 0;
+            left: 60px;
+            width: 2px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(139, 69, 19, 0.2),
+                rgba(139, 69, 19, 0.2) 1px,
+                transparent 1px,
+                transparent 24px
+            );
+        }
+
+        .ink-blot {
+            position: absolute;
+            bottom: 30px;
+            left: 40px;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(62, 39, 35, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        /* Loading Screen - FIXED: Feather centered */
         #loading-screen {
-            position: fixed; inset: 0;
-            background: var(--void);
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            z-index: 9999;
-            transition: opacity 0.8s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+            text-align: center;
         }
-        #loading-screen.hidden { opacity: 0; pointer-events: none; }
 
-        .load-eye {
-            width: 96px; height: 96px;
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .ink-loading-container {
             position: relative;
-            margin-bottom: 44px;
-        }
-        .load-ring {
-            position: absolute;
-            border-radius: 50%;
-            border: 1.5px solid;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .load-ring:nth-child(1) {
-            width: 96px; height: 96px;
-            border-color: rgba(201,168,76,0.25);
-            animation: ring-breathe 2.4s ease-in-out infinite;
-        }
-        .load-ring:nth-child(2) {
-            width: 70px; height: 70px;
-            border-color: rgba(201,168,76,0.45);
-            animation: ring-breathe 2.4s ease-in-out 0.4s infinite;
-        }
-        .load-ring:nth-child(3) {
-            width: 44px; height: 44px;
-            border-color: rgba(201,168,76,0.7);
-            animation: ring-breathe 2.4s ease-in-out 0.8s infinite;
-        }
-        .load-dot {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 14px; height: 14px;
-            border-radius: 50%;
-            background: var(--gold);
-            box-shadow: 0 0 18px var(--gold), 0 0 36px rgba(201,168,76,0.5);
-            animation: dot-pulse 2.4s ease-in-out infinite;
-        }
-        @keyframes ring-breathe {
-            0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.6; }
-            50% { transform: translate(-50%,-50%) scale(1.07); opacity: 1; }
-        }
-        @keyframes dot-pulse {
-            0%,100% { box-shadow: 0 0 14px var(--gold), 0 0 28px rgba(201,168,76,0.3); }
-            50% { box-shadow: 0 0 28px var(--gold), 0 0 56px rgba(201,168,76,0.5); }
+            width: 200px;
+            height: 200px;
+            margin-bottom: 40px;
         }
 
-        .load-title {
-            font-family: 'Bodoni Moda', serif;
+        .ink-blot-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: ink-spread 2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+            opacity: 0.9;
+        }
+
+        .quill-pen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 3.5rem;
+            color: var(--dark);
+            z-index: 2;
+            animation: quill-dip 2s ease-in-out infinite;
+            opacity: 0;
+            animation-delay: 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-text {
+            font-size: 2.2rem;
+            font-family: 'Playfair Display', serif;
             font-weight: 700;
-            font-size: 1.9rem;
-            letter-spacing: 0.28em;
-            color: var(--gold);
-            text-transform: uppercase;
+            color: var(--dark);
+            margin-top: 30px;
+            position: relative;
             overflow: hidden;
             white-space: nowrap;
+            letter-spacing: 0.15em;
+            animation: 
+                typing 1.5s steps(15, end) forwards,
+                blink-caret 0.75s step-end infinite;
             width: 0;
-            animation: type-reveal 1.4s steps(16) 0.6s forwards;
+            max-width: 15ch;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .load-sub {
-            margin-top: 10px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 0.35em;
-            color: var(--muted);
-            text-transform: uppercase;
-            opacity: 0;
-            animation: fade-in 0.5s ease 2.1s forwards;
-        }
-        @keyframes type-reveal { from { width: 0; } to { width: 16ch; } }
-        @keyframes fade-in { to { opacity: 1; } }
 
-        /* ─── Main Container ─── */
+        .loading-text::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--primary);
+            animation: blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes ink-spread {
+            0% {
+                width: 50px;
+                height: 50px;
+                opacity: 0.9;
+            }
+            50% {
+                width: 180px;
+                height: 180px;
+                opacity: 0.7;
+            }
+            100% {
+                width: 200px;
+                height: 200px;
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes quill-dip {
+            0%, 100% {
+                transform: translate(-50%, -50%) rotate(-30deg);
+                opacity: 0.9;
+            }
+            50% {
+                transform: translate(-50%, -50%) rotate(-20deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 15ch }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary); }
+        }
+
+        /* Main Container */
         .container {
-            max-width: 1100px; width: 100%;
-            display: flex; flex-direction: column; gap: 28px;
-            position: relative; z-index: 1;
-            opacity: 0; transform: translateY(14px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            text-align: center;
         }
-        .container.show { opacity: 1; transform: translateY(0); }
 
-        /* ─── Header ─── */
+        .container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         header {
             text-align: center;
-            padding: 36px 0 16px;
+            padding: 20px 0;
+            position: relative;
         }
-        .header-eyebrow {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.63rem;
-            letter-spacing: 0.45em;
-            text-transform: uppercase;
-            color: var(--gold);
-            margin-bottom: 18px;
-            display: flex; align-items: center; justify-content: center; gap: 14px;
-        }
-        .header-eyebrow::before, .header-eyebrow::after {
-            content: '';
-            width: 48px; height: 1px;
-            background: linear-gradient(to right, transparent, var(--gold-dim));
-        }
-        .header-eyebrow::after { background: linear-gradient(to left, transparent, var(--gold-dim)); }
 
         h1 {
-            font-family: 'Bodoni Moda', serif;
-            font-size: clamp(3rem, 8vw, 5.5rem);
-            font-weight: 900;
-            color: var(--white);
-            letter-spacing: -0.02em;
-            line-height: 0.88;
-            margin-bottom: 8px;
+            font-size: 3.2rem;
+            color: var(--dark);
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin: 15px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
-        h1 em {
-            display: block;
-            font-style: italic;
-            font-weight: 400;
-            color: var(--gold);
-            font-size: 0.42em;
-            letter-spacing: 0.18em;
-            margin-top: 6px;
-        }
+
         .subtitle {
-            font-size: 1.15rem;
-            color: var(--muted);
+            font-size: 1.4rem;
+            color: var(--dark);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 400;
             font-style: italic;
-            margin-top: 18px;
-            font-weight: 300;
         }
 
-        /* ─── Card shell (shared) ─── */
-        .card {
-            background: var(--surface);
-            border-radius: 16px;
-            border: 1px solid rgba(201,168,76,0.1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-        }
-        .card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            opacity: 0.55;
-        }
-
-        /* ─── User Selection ─── */
+        /* User Selection */
         #user-selection {
-            max-width: 540px; margin: 0 auto;
-            padding: 40px 36px;
+            background: var(--paper);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid rgba(139, 69, 19, 0.2);
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
             display: none;
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            text-align: center;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
-        #user-selection.show { display: block; }
+
+        #user-selection.show {
+            display: block;
+        }
 
         .selection-title {
-            font-family: 'Bodoni Moda', serif;
-            font-size: 1.55rem; font-weight: 700;
-            color: var(--white);
-            text-align: center; margin-bottom: 6px;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--dark);
+            font-family: 'Playfair Display', serif;
+            position: relative;
+            padding-bottom: 15px;
         }
-        .selection-sub {
-            text-align: center;
-            font-size: 0.95rem; color: var(--muted);
-            font-style: italic; margin-bottom: 32px;
+
+        .selection-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--accent);
         }
+
         .user-list {
-            display: flex; flex-wrap: wrap; gap: 12px;
-            justify-content: center; margin-bottom: 32px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
         }
+
+        /* Writer Profile Button Styles */
         .user-card {
-            background: var(--raised);
-            border: 1px solid rgba(201,168,76,0.18);
-            border-radius: 100px;
-            padding: 12px 26px;
-            display: flex; align-items: center; gap: 10px;
+            background: linear-gradient(to bottom, #f9f5f0, #e8dfd1);
+            border: 2px solid var(--accent);
+            border-radius: 50px;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             cursor: pointer;
-            transition: var(--t);
-            font-size: 1rem; color: var(--text);
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            min-width: 220px;
+            justify-content: center;
         }
-        .user-card:hover {
-            border-color: var(--gold-dim);
-            background: var(--hover);
-            color: var(--white);
-            transform: translateY(-2px);
+
+        .user-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
         }
+
+        .user-card:hover::before, .user-card:active::before {
+            transform: translateX(100%);
+        }
+
+        .user-card:hover, .user-card:active {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-color: var(--primary);
+        }
+
         .user-card.active {
-            background: rgba(201,168,76,0.14);
-            border-color: var(--gold);
-            color: var(--gold);
-            box-shadow: 0 0 20px rgba(201,168,76,0.12);
-        }
-        .user-card i { font-size: 0.85rem; opacity: 0.7; }
-
-        /* ─── Buttons ─── */
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 13px 30px;
-            background: var(--gold);
-            color: var(--void);
-            border: none; border-radius: 100px;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.1rem; font-weight: 700;
-            letter-spacing: 0.04em;
-            cursor: pointer;
-            transition: var(--t);
-            position: relative; overflow: hidden;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(201,168,76,0.3);
-            filter: brightness(1.07);
-        }
-        .btn:active { transform: translateY(0); }
-        .btn-ghost {
-            background: transparent;
-            color: var(--gold);
-            border: 1px solid rgba(201,168,76,0.35);
-        }
-        .btn-ghost:hover {
-            background: var(--gold-glow);
-            border-color: var(--gold);
-            box-shadow: 0 4px 16px rgba(201,168,76,0.12);
+            background: linear-gradient(to bottom, var(--accent), #b08d65);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
         }
 
-        /* ─── App Content ─── */
+        .user-card i {
+            font-size: 1.3rem;
+        }
+
+        .user-card.active i {
+            color: white;
+        }
+
+        /* Form Styles */
         #app-content {
-            display: none; opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.55s ease, transform 0.55s ease;
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
-        #app-content.show { display: block; opacity: 1; transform: translateY(0); }
 
-        /* ─── Current User Bar ─── */
-        .user-bar-wrap { text-align: center; margin-bottom: 26px; }
-        .current-user {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: var(--surface);
-            border: 1px solid rgba(201,168,76,0.18);
-            padding: 9px 22px; border-radius: 100px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem; letter-spacing: 0.12em;
-            color: var(--gold); text-transform: uppercase;
+        #app-content.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
-        .current-user i { font-size: 0.7rem; }
 
-        /* ─── Form Container ─── */
-        .form-container { padding: 28px 32px; margin-bottom: 28px; }
+        .form-container {
+            background: var(--paper);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid rgba(139, 69, 19, 0.2);
+            position: relative;
+            margin-bottom: 30px;
+            text-align: center;
+        }
 
         .form-title {
-            font-family: 'Bodoni Moda', serif;
-            font-size: 1.35rem; font-weight: 700;
-            color: var(--white);
-            display: flex; align-items: center;
-            justify-content: space-between;
-            cursor: pointer; user-select: none;
+            font-size: 1.8rem;
+            margin-bottom: 0;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Playfair Display', serif;
+            position: relative;
+            padding-bottom: 10px;
+            cursor: pointer;
+            text-align: center;
         }
-        .title-left { display: flex; align-items: center; gap: 12px; }
-        .title-left i { color: var(--gold); font-size: 0.95rem; }
 
-        .chevron {
-            width: 30px; height: 30px; border-radius: 50%;
-            background: var(--raised);
-            border: 1px solid rgba(201,168,76,0.18);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.7rem; color: var(--gold);
-            transition: transform 0.35s ease, background 0.2s;
-            flex-shrink: 0;
+        .form-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+            transition: width 0.3s ease;
         }
-        .form-title.expanded .chevron { transform: rotate(180deg); background: var(--gold-glow); }
+
+        .form-title.expanded::after {
+            width: 100px;
+        }
+
+        .form-title i {
+            transition: transform 0.3s ease;
+        }
+
+        .form-title.collapsed i {
+            transform: rotate(0deg);
+        }
+
+        .form-title.expanded i {
+            transform: rotate(180deg);
+        }
 
         .form-content {
-            overflow: hidden; height: 0;
-            transition: height 0.42s cubic-bezier(0.4,0,0.2,1);
+            overflow: hidden;
+            height: 0;
+            transition: height 0.4s ease;
+            text-align: center;
         }
-        .form-divider {
-            margin: 22px 0; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.18), transparent);
+
+        .form-group {
+            margin: 25px 0;
+            position: relative;
+            text-align: center;
         }
-        .form-group { margin-bottom: 22px; }
 
         label {
             display: block;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.68rem; letter-spacing: 0.22em;
-            text-transform: uppercase; color: var(--gold-dim);
-            margin-bottom: 9px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+            text-align: center;
         }
+
         input, textarea {
             width: 100%;
-            padding: 13px 16px;
-            background: var(--raised);
-            border: 1px solid rgba(201,168,76,0.13);
-            border-radius: 10px;
-            font-size: 1.05rem;
-            transition: border-color 0.22s, box-shadow 0.22s;
-            color: var(--white);
-            font-family: 'Cormorant Garamond', serif;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--accent);
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            transition: var(--transition);
+            color: var(--ink);
+            font-family: 'Crimson Text', serif;
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+            display: block;
         }
-        input::placeholder, textarea::placeholder { color: var(--muted); font-style: italic; }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(62, 39, 35, 0.5);
+            font-style: italic;
+            text-align: center;
+        }
+
         input:focus, textarea:focus {
             outline: none;
-            border-color: var(--gold-dim);
-            box-shadow: 0 0 0 3px rgba(201,168,76,0.09);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(193, 154, 107, 0.3);
         }
-        textarea { min-height: 105px; resize: vertical; }
 
-        /* ─── Words Section ─── */
-        .words-container { padding: 28px 32px; }
+        textarea {
+            min-height: 130px;
+            resize: vertical;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, var(--primary), #6b3c0f);
+            color: white;
+            border: none;
+            padding: 16px 35px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-family: 'Playfair Display', serif;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            margin: 10px auto;
+        }
+
+        .btn:hover, .btn:active {
+            background: linear-gradient(to bottom, #6b3c0f, var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn i {
+            font-size: 1.3rem;
+        }
+
+        /* Words List */
+        .words-container {
+            background: var(--paper);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+            border: 1px solid rgba(139, 69, 19, 0.2);
+            position: relative;
+            text-align: center;
+        }
 
         .section-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 26px; flex-wrap: wrap; gap: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+            text-align: center;
         }
-        .section-title {
-            font-family: 'Bodoni Moda', serif;
-            font-size: 1.45rem; font-weight: 700;
-            color: var(--white);
-            display: flex; align-items: center; gap: 12px;
-        }
-        .section-title i { color: var(--gold); font-size: 1rem; }
 
-        .controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-family: 'Playfair Display', serif;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+        }
+
+        /* FIXED: Word count styling - centered above button */
+        .controls {
+            display: flex;
+            flex-direction: column; /* Changed to column layout */
+            align-items: center; /* Center items */
+            gap: 15px; /* Space between elements */
+            justify-content: center;
+            margin-bottom: 15px;
+        }
 
         #word-count {
-            display: flex; align-items: center; gap: 7px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem; letter-spacing: 0.1em;
-            color: var(--muted);
-            background: var(--raised);
-            padding: 7px 14px; border-radius: 100px;
-            border: 1px solid rgba(201,168,76,0.09);
+            background: rgba(193, 154, 107, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        #word-count i { color: var(--gold-dim); font-size: 0.68rem; }
 
-        /* ─── Words Grid ─── */
+        .random-btn {
+            background: linear-gradient(to bottom, var(--accent), #b08d65);
+            color: var(--dark);
+        }
+
         .words-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(295px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
         }
 
-        /* ─── Word Card ─── */
         .word-card {
-            background: var(--raised);
-            border-radius: 12px;
-            padding: 22px;
-            border: 1px solid rgba(201,168,76,0.09);
-            cursor: pointer;
-            transition: var(--t);
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            border: 1px solid rgba(139, 69, 19, 0.2);
+            transition: var(--transition);
             position: relative;
-            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
         }
-        .word-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0;
-            width: 2px; height: 100%;
-            background: linear-gradient(to bottom, var(--gold), transparent);
-            opacity: 0; transition: opacity 0.3s;
-        }
+
         .word-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(201,168,76,0.22);
-            box-shadow: 0 14px 44px rgba(0,0,0,0.5);
-            background: var(--hover);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
-        .word-card:hover::before { opacity: 1; }
 
         .word-header {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            margin-bottom: 8px;
-        }
-        .word-text {
-            font-family: 'Bodoni Moda', serif;
-            font-size: 1.5rem; font-weight: 700;
-            color: var(--white);
-            line-height: 1.1; word-break: break-word; flex: 1;
-        }
-        .pronunciation {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.76rem; letter-spacing: 0.03em;
-            color: var(--gold-dim);
-            margin-bottom: 11px;
-        }
-        .definition {
-            color: var(--text);
-            font-size: 0.98rem; line-height: 1.65;
-            margin-bottom: 14px;
-        }
-        .word-footer {
-            display: flex; justify-content: space-between; align-items: center;
-            border-top: 1px solid rgba(201,168,76,0.07);
-            padding-top: 12px;
-            font-size: 0.78rem; color: var(--muted);
-            flex-wrap: wrap; gap: 8px;
-        }
-        .user-tag {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: rgba(201,168,76,0.08);
-            color: var(--gold-dim);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.68rem;
-            padding: 3px 9px; border-radius: 100px;
-            border: 1px solid rgba(201,168,76,0.13);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
         }
 
-        /* ─── Reactions ─── */
+        .word-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            max-width: 100%;
+        }
+
+        .pronunciation {
+            color: var(--secondary);
+            font-style: italic;
+            margin: 10px 0;
+            font-size: 1.1rem;
+            text-align: center;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .definition {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: var(--ink);
+            text-align: center;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .word-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(139, 69, 19, 0.1);
+            padding-top: 15px;
+            color: var(--secondary);
+            font-size: 0.95rem;
+            flex-wrap: wrap;
+        }
+
+        .user-tag {
+            background: rgba(193, 154, 107, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* UPDATED REACTIONS STYLES - Count in bottom right of circle */
         .reactions-container {
-            display: flex; flex-wrap: wrap; gap: 7px;
-            margin: 10px 0 14px; align-items: center; min-height: 34px;
+            position: relative;
+            margin: 10px 0 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 40px;
         }
+
         .reaction {
-            position: relative; cursor: pointer;
-            transition: var(--t); font-size: 0.95rem;
-            height: 32px; padding: 0 9px; border-radius: 100px;
-            background: rgba(201,168,76,0.06);
-            display: inline-flex; align-items: center; gap: 5px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.2rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(193, 154, 107, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             user-select: none;
-            border: 1px solid rgba(201,168,76,0.1);
+            -webkit-user-select: none;
+            border: 2px solid transparent;
         }
-        .reaction:hover { background: rgba(201,168,76,0.14); border-color: rgba(201,168,76,0.28); transform: scale(1.05); }
-        .reaction.active { background: rgba(201,168,76,0.18); border-color: var(--gold-dim); }
+
+        .reaction:hover, .reaction.active {
+            background: rgba(139, 69, 19, 0.2);
+            transform: translateY(-2px);
+            border-color: rgba(139, 69, 19, 0.3);
+        }
 
         .reaction-count {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.68rem; color: var(--gold-dim);
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 2;
         }
-        .reaction-tooltip {
-            position: absolute; bottom: calc(100% + 7px); left: 50%;
-            transform: translateX(-50%);
-            background: var(--surface);
-            border: 1px solid rgba(201,168,76,0.18);
-            color: var(--text);
-            padding: 5px 10px; border-radius: 8px;
-            font-size: 0.76rem; white-space: nowrap;
-            z-index: 100; opacity: 0; visibility: hidden;
-            transition: opacity 0.2s, visibility 0.2s;
-            pointer-events: none;
-            max-width: 170px; overflow: hidden; text-overflow: ellipsis;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-        }
-        .reaction:hover .reaction-tooltip { opacity: 1; visibility: visible; }
 
+        .reaction-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            pointer-events: none;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .reaction-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: var(--dark) transparent transparent transparent;
+        }
+
+        .reaction:hover .reaction-tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: calc(100% + 10px);
+        }
+
+        /* Add Reaction Button */
         .add-reaction {
-            height: 32px; width: 32px; border-radius: 50%;
-            background: rgba(201,168,76,0.04);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: var(--t);
-            font-size: 0.95rem; color: var(--gold-dim);
-            border: 1px dashed rgba(201,168,76,0.22);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(139, 69, 19, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.5rem;
+            color: var(--primary);
+            border: 2px dashed rgba(139, 69, 19, 0.3);
             position: relative;
         }
-        .add-reaction:hover { background: rgba(201,168,76,0.11); border-color: var(--gold-dim); color: var(--gold); transform: scale(1.05); }
 
+        .add-reaction:hover, .add-reaction:active {
+            background: rgba(139, 69, 19, 0.2);
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .add-reaction .reaction-tooltip {
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        /* Reaction Dropdown */
         .reaction-dropdown {
-            position: fixed;
-            background: var(--surface);
-            border: 1px solid rgba(201,168,76,0.22);
-            border-radius: 12px; padding: 9px;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.65);
-            z-index: 500; display: none; gap: 5px;
-            flex-wrap: wrap; width: 188px; justify-content: center;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            z-index: 200;
+            display: none;
+            gap: 8px;
+            border: 1px solid rgba(139, 69, 19, 0.2);
+            flex-wrap: wrap;
+            width: 200px;
+            justify-content: center;
+            margin-bottom: 10px;
         }
-        .reaction-dropdown.show { display: flex; animation: pop-in 0.17s ease-out; }
-        @keyframes pop-in {
-            from { opacity: 0; transform: translateX(-50%) scale(0.88); }
-            to   { opacity: 1; transform: translateX(-50%) scale(1); }
+
+        .reaction-dropdown.show {
+            display: flex;
+            animation: fadeInUp 0.2s ease-out;
         }
+
         .reaction-option {
-            font-size: 1.45rem; cursor: pointer;
-            border-radius: 8px; transition: var(--t);
-            background: none; border: 1px solid transparent;
-            width: 38px; height: 38px;
-            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 50%;
+            transition: var(--transition);
+            background: none;
+            border: none;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
-        .reaction-option:hover { background: rgba(201,168,76,0.11); transform: scale(1.2); }
-        .reaction-option.active { background: rgba(201,168,76,0.18); border-color: var(--gold-dim); }
 
-        /* ─── Speaker Button ─── */
+        .reaction-option:hover {
+            background: rgba(139, 69, 19, 0.1);
+            transform: scale(1.2);
+        }
+
+        .reaction-option.active {
+            background: rgba(139, 69, 19, 0.2);
+            transform: scale(1.1);
+            border: 2px solid var(--primary);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 10px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
+        /* Speaker Button */
         .speaker-btn {
-            background: transparent; border: none;
-            color: var(--muted); cursor: pointer;
-            font-size: 0.82rem; transition: var(--t);
-            width: 28px; height: 28px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; flex-shrink: 0;
+            background: transparent;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+            padding: 5px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .speaker-btn:hover { color: var(--gold); background: var(--gold-glow); }
 
-        /* ─── Empty State ─── */
-        .empty-state {
-            text-align: center; padding: 60px 20px;
-            color: var(--muted); grid-column: 1 / -1;
+        .speaker-btn:hover {
+            color: var(--primary);
+            background: rgba(139, 69, 19, 0.1);
         }
-        .empty-eye {
-            width: 56px; height: 56px; border-radius: 50%;
-            border: 1.5px solid rgba(201,168,76,0.2);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 18px;
-            font-size: 1.3rem; color: var(--gold-dim);
-        }
-        .empty-state h3 {
-            font-family: 'Bodoni Moda', serif;
-            font-size: 1.45rem;
-            color: rgba(255,255,255,0.4); margin-bottom: 7px;
-        }
-        .empty-state p { font-size: 0.98rem; }
 
-        /* ─── Notification ─── */
+        /* Notification */
         .notification {
-            position: fixed; top: 22px; right: 22px;
-            background: var(--surface);
-            border: 1px solid rgba(201,168,76,0.18);
-            padding: 14px 18px; border-radius: 12px;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.55);
-            display: flex; align-items: flex-start; gap: 12px;
-            z-index: 5000;
-            transform: translateX(calc(100% + 48px));
-            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-            max-width: 310px;
-            border-left: 3px solid var(--green);
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: white;
+            color: var(--dark);
+            padding: 18px 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 100;
+            transform: translateX(200%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border-left: 4px solid var(--success);
+            max-width: 350px;
+            text-align: left;
         }
-        .notification.show { transform: translateX(0); }
-        .notification.error { border-left-color: var(--red); }
-        .notification .notif-icon { font-size: 1.05rem; color: var(--green); margin-top: 2px; flex-shrink: 0; }
-        .notification.error .notif-icon { color: var(--red); }
-        .notification-content h4 {
-            font-family: 'Bodoni Moda', serif;
-            font-size: 0.95rem; font-weight: 700;
-            color: var(--white); margin-bottom: 2px;
-        }
-        .notification-content p { font-size: 0.84rem; color: var(--muted); }
 
-        /* ─── Popup ─── */
-        .popup-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.88);
-            backdrop-filter: blur(8px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 2000; opacity: 0; visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+        .notification.show {
+            transform: translateX(0);
         }
-        .popup-overlay.show { opacity: 1; visibility: visible; }
+
+        .notification i {
+            font-size: 1.8rem;
+            color: var(--success);
+        }
+
+        .notification.error {
+            border-left-color: var(--error);
+        }
+
+        .notification.error i {
+            color: var(--error);
+        }
+
+        .notification-content h4 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .notification-content p {
+            font-size: 1rem;
+            color: var(--secondary);
+        }
+
+        /* Word Popup */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
 
         .word-popup {
-            background: var(--surface);
-            border-radius: 20px;
-            padding: 48px 38px;
-            max-width: 510px; width: 90%;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.75);
+            background: var(--paper);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             position: relative;
-            transform: translateY(18px) scale(0.97);
+            transform: translateY(30px);
             opacity: 0;
-            transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
-            border: 1px solid rgba(201,168,76,0.18);
-            text-align: center; overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border: 1px solid rgba(139, 69, 19, 0.3);
+            text-align: center;
         }
-        .word-popup::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+
+        .popup-overlay.show .word-popup {
+            transform: translateY(0);
+            opacity: 1;
         }
-        .popup-overlay.show .word-popup { transform: translateY(0) scale(1); opacity: 1; }
 
         .close-popup {
-            position: absolute; top: 14px; right: 14px;
-            background: var(--raised);
-            border: 1px solid rgba(201,168,76,0.14);
-            color: var(--muted); cursor: pointer;
-            transition: var(--t);
-            width: 34px; height: 34px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; font-size: 0.8rem;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
         }
-        .close-popup:hover { color: var(--white); border-color: var(--gold-dim); background: var(--gold-glow); }
 
-        .popup-header { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 6px; }
+        .close-popup:hover, .close-popup:active {
+            background: rgba(139, 69, 19, 0.1);
+            color: var(--primary);
+        }
+
+        .popup-content {
+            text-align: center;
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
         .popup-word {
-            font-family: 'Bodoni Moda', serif;
-            font-size: 2.6rem; font-weight: 900;
-            color: var(--white); word-break: break-word; line-height: 1;
+            font-size: 2.5rem;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
+
         .popup-pronunciation {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.82rem; color: var(--gold-dim);
-            margin-bottom: 22px; letter-spacing: 0.04em;
+            font-size: 1.3rem;
+            color: var(--secondary);
+            font-style: italic;
+            margin-bottom: 20px;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
-        .popup-divider {
-            height: 1px; margin-bottom: 22px;
-            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent);
-        }
+
         .popup-definition {
-            font-size: 1.1rem; line-height: 1.75;
-            color: var(--text); margin-bottom: 18px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            color: var(--ink);
+            text-align: center;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
+
         .popup-user {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem; letter-spacing: 0.12em;
-            color: var(--muted); text-transform: uppercase;
+            font-size: 1.1rem;
+            color: var(--secondary);
+            font-family: 'Playfair Display', serif;
         }
 
-        /* ─── PWA Banner ─── */
-        .pwa-banner {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: var(--surface);
-            border-bottom: 1px solid rgba(201,168,76,0.18);
-            color: var(--text);
-            display: none; justify-content: space-between; align-items: center;
-            padding: 11px 18px; z-index: 10000;
-            transform: translateY(-100%);
-            transition: transform 0.4s ease;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.45);
-            flex-wrap: wrap; gap: 10px;
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--secondary);
+            grid-column: 1 / -1;
         }
-        .pwa-banner.show { transform: translateY(0); }
-        .pwa-content { display: flex; align-items: center; gap: 12px; font-size: 0.92rem; flex: 1; }
-        .pwa-content i { color: var(--gold); }
-        .pwa-buttons { display: flex; gap: 9px; }
-        .pwa-btn {
-            padding: 7px 16px; border: none; border-radius: 100px;
-            font-weight: 600; cursor: pointer;
-            font-family: 'Cormorant Garamond', serif; font-size: 0.98rem;
-            transition: var(--t);
-        }
-        .pwa-dismiss { background: var(--raised); color: var(--muted); border: 1px solid rgba(201,168,76,0.13); }
-        .pwa-dismiss:hover { color: var(--text); }
-        .pwa-install { background: var(--gold); color: var(--void); }
-        .pwa-install:hover { box-shadow: 0 4px 14px rgba(201,168,76,0.3); }
 
-        /* ─── iOS Install ─── */
-        #ios-install-instructions {
-            position: fixed; bottom: 18px; left: 50%;
-            transform: translateX(-50%);
-            background: var(--surface);
-            border: 1px solid rgba(201,168,76,0.2);
-            padding: 18px 22px; border-radius: 14px;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
-            z-index: 1002; display: none;
-            max-width: 90%; width: 390px; text-align: center;
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+            opacity: 0.7;
         }
-        #ios-install-instructions.show { display: block; }
-        #ios-install-instructions .instructions-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        #ios-install-instructions .instructions-header h3 { font-family: 'Bodoni Moda', serif; font-size: 1.05rem; color: var(--white); }
-        #ios-install-instructions .instructions-content { font-size: 0.9rem; line-height: 1.6; color: var(--text); }
-        #ios-install-instructions .instructions-steps { text-align: left; padding-left: 18px; margin: 9px 0; }
-        #ios-install-instructions .instructions-steps li { margin-bottom: 5px; }
-        #ios-install-instructions .close-instructions { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.95rem; }
-        #ios-install-instructions .close-instructions:hover { color: var(--white); }
 
-        /* ─── Footer ─── */
+        .empty-state h3 {
+            margin-bottom: 10px;
+            font-weight: 500;
+            font-size: 1.8rem;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Current User Indicator */
+        .current-user {
+            background: linear-gradient(to bottom, var(--primary), #6b3c0f);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-family: 'Playfair Display', serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin: 15px auto 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 1.2rem;
+        }
+
+        /* Footer */
         footer {
-            text-align: center; padding: 18px; margin-top: auto;
-            color: var(--muted); font-style: italic; font-size: 0.9rem;
-            position: relative; z-index: 1;
+            text-align: center;
+            padding: 20px;
+            margin-top: auto;
+            color: var(--secondary);
+            font-family: 'Crimson Text', serif;
+            font-size: 1.1rem;
+            width: 100%;
         }
 
-        /* ─── Responsive ─── */
+        /* PWA Install Banner - UPDATED to match SplashPaint style */
+        .pwa-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #8B4513, #A67C52);
+            color: white;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: translateY(-100%);
+            transition: transform 0.5s ease;
+            flex-wrap: wrap;
+        }
+        
+        .pwa-banner.show {
+            transform: translateY(0);
+        }
+        
+        .pwa-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .pwa-content i {
+            font-size: 1.8rem;
+            color: #FFE66D;
+        }
+        
+        .pwa-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .pwa-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pwa-dismiss {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .pwa-dismiss:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .pwa-install {
+            background: linear-gradient(to right, #FFE66D, #FFD166);
+            color: #182848;
+        }
+        
+        .pwa-install:hover {
+            background: linear-gradient(to right, #FFD166, #FFE66D);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
         @media (max-width: 768px) {
-            body { padding: 14px; }
-            .form-container, .words-container { padding: 22px 18px; }
-            #user-selection { padding: 26px 18px; }
-            .user-card { min-width: 100%; justify-content: center; }
-            .words-grid { grid-template-columns: 1fr; }
-            .section-header { flex-direction: column; align-items: flex-start; }
-            .controls { width: 100%; justify-content: space-between; }
-            .notification { top: 14px; right: 14px; left: 14px; max-width: none; }
+            .pwa-banner {
+                padding: 10px 15px;
+            }
+            .pwa-content {
+                font-size: 0.95rem;
+            }
+            .pwa-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
         }
+        
         @media (max-width: 480px) {
-            .word-popup { padding: 36px 22px; }
-            .popup-word { font-size: 2.1rem; }
-            .pwa-banner { flex-direction: column; }
-            .pwa-buttons { width: 100%; justify-content: center; }
-            h1 { font-size: 2.7rem; }
+            .pwa-banner {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            .pwa-content {
+                justify-content: center;
+            }
+            .pwa-buttons {
+                justify-content: center;
+            }
         }
+
+        /* iOS-specific instructions */
+        #ios-install-instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--paper);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 1002;
+            display: none;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            border: 2px solid var(--accent);
+        }
+
+        #ios-install-instructions.show {
+            display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        #ios-install-instructions .instructions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        #ios-install-instructions .instructions-header h3 {
+            font-size: 1.2rem;
+            color: var(--dark);
+            font-family: 'Playfair Display', serif;
+        }
+
+        #ios-install-instructions .instructions-content {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--ink);
+            margin-bottom: 15px;
+        }
+
+        #ios-install-instructions .instructions-steps {
+            text-align: left;
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        #ios-install-instructions .instructions-steps li {
+            margin-bottom: 8px;
+        }
+
+        #ios-install-instructions .close-instructions {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        /* Responsive Design - Mobile First */
+        @media (max-width: 900px) {
+            .words-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .form-container, .words-container {
+                padding: 25px 20px;
+            }
+            
+            .current-user {
+                font-size: 1.1rem;
+                padding: 8px 20px;
+            }
+            
+            .form-title {
+                font-size: 1.6rem;
+            }
+
+            .user-card {
+                min-width: 100%;
+            }
+            
+            /* Responsive banner */
+            .pwa-banner {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .pwa-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            #ios-install-instructions {
+                width: 90%;
+                padding: 12px 15px;
+            }
+            
+            .popup-word {
+                font-size: 2rem;
+            }
+            
+            .popup-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .word-footer {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+            
+            .reaction-dropdown {
+                width: 180px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .reaction-option {
+                width: 40px;
+                height: 40px;
+                font-size: 1.6rem;
+            }
+            
+            .reaction, .add-reaction {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .reaction-count {
+                width: 18px;
+                height: 18px;
+                font-size: 0.65rem;
+                bottom: -5px;
+                right: -5px;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .words-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .random-btn {
+                width: 100%;
+            }
+            
+            #user-selection {
+                padding: 20px 15px;
+            }
+            
+            .selection-title {
+                font-size: 1.5rem;
+            }
+            
+            .ink-loading-container {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .loading-text {
+                font-size: 1.8rem;
+            }
+            
+            .word-text {
+                font-size: 1.5rem;
+            }
+            
+            .popup-word {
+                font-size: 1.8rem;
+            }
+            
+            .popup-definition {
+                font-size: 1.1rem;
+            }
+            
+            .reaction-dropdown {
+                width: 160px;
+                padding: 10px;
+            }
+            
+            .reaction-option {
+                width: 36px;
+                height: 36px;
+                font-size: 1.5rem;
+            }
+            
+            .reaction, .add-reaction {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .reaction-count {
+                width: 16px;
+                height: 16px;
+                font-size: 0.6rem;
+                bottom: -4px;
+                right: -4px;
+            }
+        }
+
+        @media (max-width: 410px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .form-title, .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .notification {
+                top: 15px;
+                right: 15px;
+                left: 15px;
+                max-width: none;
+            }
+            
+            .word-popup {
+                padding: 30px 20px;
+            }
+            
+            .form-container, .words-container {
+                padding: 20px 15px;
+            }
+            
+            .word-card {
+                padding: 20px;
+            }
+            
+            .current-user {
+                font-size: 1rem;
+                padding: 8px 18px;
+            }
+            
+            .ink-loading-container {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .loading-text {
+                font-size: 1.5rem;
+            }
+            
+            .word-header {
+                flex-direction: column;
+            }
+            
+            .reaction-dropdown {
+                width: 140px;
+            }
+            
+            .reaction-option {
+                width: 32px;
+                height: 32px;
+                font-size: 1.4rem;
+            }
+            
+            .reaction, .add-reaction {
+                width: 32px;
+                height: 32px;
+                font-size: 1.1rem;
+            }
+            
+            .reaction-count {
+                width: 14px;
+                height: 14px;
+                font-size: 0.55rem;
+                bottom: -3px;
+                right: -3px;
+            }
+        }
+        
         @supports (-webkit-touch-callout: none) {
-            input, textarea, button { font-size: 16px; }
+            input, textarea, button {
+                font-size: 16px;
+            }
+            
+            .btn {
+                padding: 16px 30px;
+            }
+        }
+        
+        a, button, .user-card, .word-card {
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-
-    <!-- PWA Install Banner -->
+    <!-- PWA Install Banner - UPDATED to match SplashPaint style -->
     <div id="pwa-banner" class="pwa-banner">
         <div class="pwa-content">
             <i class="fas fa-download"></i>
@@ -787,127 +1533,134 @@
     <div id="ios-install-instructions">
         <div class="instructions-header">
             <h3>Install Literary Oculus</h3>
-            <button class="close-instructions" id="close-ios-instructions"><i class="fas fa-times"></i></button>
+            <button class="close-instructions" id="close-ios-instructions">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         <div class="instructions-content">
-            <p>To install on iOS:</p>
+            <p>To install this app on your iOS device:</p>
             <ol class="instructions-steps">
                 <li>Tap the Share button <i class="fas fa-share-square"></i></li>
-                <li>Select "Add to Home Screen"</li>
-                <li>Tap "Add" in the top right</li>
+                <li>Scroll down and select "Add to Home Screen"</li>
+                <li>Tap "Add" in the top right corner</li>
             </ol>
         </div>
     </div>
-
-    <!-- Loading Screen -->
+    
+    <div class="page-corner"></div>
+    <div class="page-lines"></div>
+    <div class="ink-blot"></div>
+    
+    <!-- Loading Screen - FIXED: Feather centered -->
     <div id="loading-screen">
-        <div class="load-eye">
-            <div class="load-ring"></div>
-            <div class="load-ring"></div>
-            <div class="load-ring"></div>
-            <div class="load-dot"></div>
+        <div class="ink-loading-container">
+            <div class="ink-blot-loading"></div>
+            <div class="quill-pen">
+                <i class="fas fa-feather-alt"></i>
+            </div>
         </div>
-        <div class="load-title">Literary Oculus</div>
-        <div class="load-sub">Writer's Vocabulary Tracker</div>
+        <div class="loading-text">Literary Oculus</div>
     </div>
 
     <!-- Main Container -->
     <div class="container" id="main-container">
-
         <header>
-            <div class="header-eyebrow">For Writers</div>
-            <h1>Literary<em>Oculus</em></h1>
-            <p class="subtitle">Expand your vocabulary with words worthy of the greatest novels</p>
+            <h1>Literary Oculus</h1>
+            <p class="subtitle">Expand your writer's vocabulary with words worthy of the greatest novels</p>
         </header>
 
         <!-- User Selection -->
-        <div id="user-selection" class="card">
+        <div id="user-selection">
             <h2 class="selection-title">Select Your Writer Profile</h2>
-            <p class="selection-sub">Choose your identity to begin your journey</p>
-            <div class="user-list" id="user-list"></div>
-            <div style="text-align:center">
-                <button class="btn" id="start-btn"><i class="fas fa-feather-alt"></i> Begin Writing Journey</button>
+            
+            <div class="user-list" id="user-list">
+                <!-- User profiles will be loaded from Firebase -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn" id="start-btn">Begin Writing Journey</button>
             </div>
         </div>
 
         <!-- App Content -->
         <div id="app-content">
-
-            <div class="user-bar-wrap">
-                <div class="current-user">
-                    <i class="fas fa-feather-alt"></i>
-                    <span id="current-user-name"></span>
-                </div>
+            <div class="current-user">
+                <i class="fas fa-feather-alt"></i>
+                <span id="current-user-name"></span>
             </div>
-
-            <!-- Add Word Form -->
-            <div class="form-container card">
-                <div class="form-title collapsed" id="form-toggle">
-                    <div class="title-left">
-                        <i class="fas fa-plus-circle"></i>
-                        Add New Word
-                    </div>
-                    <div class="chevron"><i class="fas fa-chevron-down"></i></div>
-                </div>
+            
+            <!-- Input Form -->
+            <div class="form-container">
+                <h2 class="form-title collapsed" id="form-toggle">
+                    <i class="fas fa-chevron-down"></i> Add New Word
+                </h2>
                 <div class="form-content" id="form-content">
-                    <div class="form-divider"></div>
                     <form id="word-form">
                         <div class="form-group">
-                            <label for="word">Word / Phrase</label>
+                            <label for="word"><i class="fas fa-font"></i> Word / Phrase</label>
                             <input type="text" id="word" placeholder="Enter the word or phrase" required>
                         </div>
                         <div class="form-group">
-                            <label for="pronunciation">Pronunciation</label>
+                            <label for="pronunciation"><i class="fas fa-volume-up"></i> Pronunciation</label>
                             <input type="text" id="pronunciation" placeholder="e.g., /prəˌnʌnsiˈeɪʃən/" required>
                         </div>
                         <div class="form-group">
-                            <label for="definition">Definition</label>
+                            <label for="definition"><i class="fas fa-book"></i> Definition</label>
                             <textarea id="definition" placeholder="Enter the detailed definition" required></textarea>
                         </div>
-                        <div style="text-align:center">
-                            <button type="submit" class="btn"><i class="fas fa-feather"></i> Add to Oculus</button>
-                        </div>
+                        <button type="submit" class="btn"><i class="fas fa-feather"></i> Add to Oculus</button>
                     </form>
                 </div>
             </div>
 
             <!-- Words List -->
-            <div class="words-container card">
+            <div class="words-container">
                 <div class="section-header">
                     <h2 class="section-title"><i class="fas fa-book-open"></i> Your Oculus</h2>
                     <div class="controls">
-                        <div id="word-count"><i class="fas fa-book"></i><span>0 words</span></div>
-                        <button class="btn btn-ghost" id="random-word-btn"><i class="fas fa-random"></i> Random Word</button>
+                        <!-- Word count centered above button -->
+                        <div id="word-count">
+                            <i class="fas fa-book"></i>
+                            <span>0 words</span>
+                        </div>
+                        <button class="btn random-btn" id="random-word-btn"><i class="fas fa-random"></i> Random Word</button>
                     </div>
                 </div>
-                <div class="words-grid" id="words-list"></div>
+                <div class="words-grid" id="words-list">
+                    <!-- Words will be loaded from Firebase -->
+                </div>
             </div>
-
         </div>
     </div>
 
-    <footer>Inspired by Antek &mdash; made by O.G</footer>
+    <!-- Footer -->
+    <footer>
+        Inspired by Antek made by O.G
+    </footer>
 
     <!-- Notification -->
     <div class="notification" id="notification">
-        <i class="fas fa-check-circle notif-icon"></i>
+        <i class="fas fa-check-circle"></i>
         <div class="notification-content">
             <h4 id="notification-title">Word Added!</h4>
             <p id="notification-message">Successfully added to your oculus</p>
         </div>
     </div>
-
+    
     <!-- Word Popup -->
     <div class="popup-overlay" id="popup-overlay">
         <div class="word-popup">
-            <button class="close-popup" id="close-popup"><i class="fas fa-times"></i></button>
+            <button class="close-popup" id="close-popup">
+                <i class="fas fa-times"></i>
+            </button>
             <div class="popup-content">
                 <div class="popup-header">
                     <div class="popup-word" id="popup-word"></div>
-                    <button class="speaker-btn" id="popup-speaker-btn"><i class="fas fa-volume-up"></i></button>
+                    <button class="speaker-btn" id="popup-speaker-btn">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
                 </div>
                 <div class="popup-pronunciation" id="popup-pronunciation"></div>
-                <div class="popup-divider"></div>
                 <div class="popup-definition" id="popup-definition"></div>
                 <div class="popup-user" id="popup-user"></div>
             </div>
@@ -915,7 +1668,7 @@
     </div>
 
     <script>
-        // ─── Firebase ───
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyArwyB6tsugLz2db_NxNLwhRzbnFpjcoPM",
             authDomain: "literary-oculus.firebaseapp.com",
@@ -924,326 +1677,775 @@
             messagingSenderId: "721507977834",
             appId: "721507977834"
         };
+
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ─── DOM ───
-        const loadingScreen    = document.getElementById('loading-screen');
-        const mainContainer    = document.getElementById('main-container');
-        const userSelection    = document.getElementById('user-selection');
-        const userList         = document.getElementById('user-list');
-        const appContent       = document.getElementById('app-content');
-        const startBtn         = document.getElementById('start-btn');
-        const currentUserName  = document.getElementById('current-user-name');
-        const wordForm         = document.getElementById('word-form');
-        const wordsList        = document.getElementById('words-list');
-        const wordCountEl      = document.getElementById('word-count').querySelector('span');
-        const randomWordBtn    = document.getElementById('random-word-btn');
-        const notification     = document.getElementById('notification');
-        const notifTitle       = document.getElementById('notification-title');
-        const notifMessage     = document.getElementById('notification-message');
-        const popupOverlay     = document.getElementById('popup-overlay');
-        const closePopup       = document.getElementById('close-popup');
-        const popupWord        = document.getElementById('popup-word');
-        const popupPron        = document.getElementById('popup-pronunciation');
-        const popupDef         = document.getElementById('popup-definition');
-        const popupUser        = document.getElementById('popup-user');
-        const popupSpeaker     = document.getElementById('popup-speaker-btn');
-        const formToggle       = document.getElementById('form-toggle');
-        const formContent      = document.getElementById('form-content');
-        const pwaBanner        = document.getElementById('pwa-banner');
-        const installBtn       = document.getElementById('install-pwa');
-        const dismissBtn       = document.getElementById('dismiss-banner');
-        const iosInstructions  = document.getElementById('ios-install-instructions');
-        const closeIosBtn      = document.getElementById('close-ios-instructions');
+        // DOM Elements
+        const loadingScreen = document.getElementById('loading-screen');
+        const mainContainer = document.getElementById('main-container');
+        const userSelection = document.getElementById('user-selection');
+        const userList = document.getElementById('user-list');
+        const appContent = document.getElementById('app-content');
+        const startBtn = document.getElementById('start-btn');
+        const currentUserName = document.getElementById('current-user-name');
+        const wordForm = document.getElementById('word-form');
+        const wordsListContainer = document.getElementById('words-list');
+        const wordCount = document.getElementById('word-count').querySelector('span');
+        const randomWordBtn = document.getElementById('random-word-btn');
+        const notification = document.getElementById('notification');
+        const notificationTitle = document.getElementById('notification-title');
+        const notificationMessage = document.getElementById('notification-message');
+        const popupOverlay = document.getElementById('popup-overlay');
+        const closePopup = document.getElementById('close-popup');
+        const popupWord = document.getElementById('popup-word');
+        const popupPronunciation = document.getElementById('popup-pronunciation');
+        const popupDefinition = document.getElementById('popup-definition');
+        const popupUser = document.getElementById('popup-user');
+        const popupSpeakerBtn = document.getElementById('popup-speaker-btn');
+        const formToggle = document.getElementById('form-toggle');
+        const formContent = document.getElementById('form-content');
+        const pwaBanner = document.getElementById('pwa-banner');
+        const installBtn = document.getElementById('install-pwa');
+        const dismissBtn = document.getElementById('dismiss-banner');
+        const iosInstructions = document.getElementById('ios-install-instructions');
+        const closeIosInstructions = document.getElementById('close-ios-instructions');
 
-        // ─── State ───
-        let currentUser = null, words = [], users = [], deferredPrompt = null;
-        const speech = window.speechSynthesis;
-        const emojiOptions = ['❤️','💥','🤯','👍','⭐'];
+        // State
+        let currentUser = null;
+        let words = [];
+        let users = [];
+        let deferredPrompt = null;
+        let isAppInstalled = false;
+        let speechSynthesis = window.speechSynthesis;
+        const emojiOptions = ['❤️', '💥', '🤯', '👍', '⭐'];
 
-        // ─── PWA helpers ───
-        const isIos = () => ['iPad Simulator','iPhone Simulator','iPod Simulator','iPad','iPhone','iPod'].includes(navigator.platform)
-            || (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
-        const isInstalled = () => window.matchMedia('(display-mode: standalone)').matches
-            || window.navigator.standalone || document.referrer.includes('android-app://');
-        const canInstall = () => !isInstalled() && !sessionStorage.getItem('pwaDismissed')
-            && ('onbeforeinstallprompt' in window || isIos());
+        // Detect iOS
+        function isIos() {
+            return [
+                'iPad Simulator',
+                'iPhone Simulator',
+                'iPod Simulator',
+                'iPad',
+                'iPhone',
+                'iPod'
+            ].includes(navigator.platform) || 
+            (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+        }
 
+        // Detect standalone mode
+        function isInStandaloneMode() {
+            return (window.matchMedia('(display-mode: standalone)').matches) || 
+                   (window.navigator.standalone) || 
+                   (document.referrer.includes('android-app://'));
+        }
+
+        // Check if the app is already installed
+        function checkIfAppInstalled() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   (window.navigator.standalone) || 
+                   document.referrer.includes('android-app://');
+        }
+        
+        // Enhanced PWA detection for all browsers
+        function checkPWAInstallable() {
+            // Check if app is already installed
+            if (checkIfAppInstalled()) {
+                return false;
+            }
+            
+            // Check if the beforeinstallprompt event is supported
+            const isBeforeInstallPromptSupported = 'onbeforeinstallprompt' in window;
+            
+            // Check if it's iOS (which handles PWA differently)
+            const isIOS = isIos();
+            
+            // Check session storage for dismissal
+            const isDismissed = sessionStorage.getItem('pwaDismissed') === 'true';
+            
+            return (isBeforeInstallPromptSupported || isIOS) && !isDismissed;
+        }
+        
+        // PWA Banner Logic
         function showPwaBanner() {
-            if (!canInstall()) return;
+            if (!checkPWAInstallable()) return;
+            
+            // Calculate and set body padding
             pwaBanner.style.display = 'flex';
-            document.body.style.paddingTop = `${pwaBanner.offsetHeight}px`;
-            setTimeout(() => pwaBanner.classList.add('show'), 50);
+            const bannerHeight = pwaBanner.offsetHeight;
+            document.body.style.paddingTop = `${bannerHeight}px`;
+            
+            // Show banner with animation
+            setTimeout(() => {
+                pwaBanner.classList.add('show');
+            }, 50);
         }
-        function hidePwaBanner() {
-            pwaBanner.classList.remove('show');
-            setTimeout(() => { pwaBanner.style.display = 'none'; document.body.style.paddingTop = '24px'; }, 500);
+        
+        // Before Install Prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Store the event for later use
+            deferredPrompt = e;
+            // Show our banner
+            showPwaBanner();
+        });
+        
+        // Check if we should show the banner on iOS
+        function checkIOSPWA() {
+            if (isIos()) {
+                // Show iOS-specific instructions after a delay
+                setTimeout(() => {
+                    if (checkPWAInstallable()) {
+                        const pwaText = document.querySelector('.pwa-text');
+                        if (pwaText) {
+                            pwaText.textContent = "Add this app to your home screen for quick access";
+                        }
+                        showPwaBanner();
+                    }
+                }, 3000);
+            }
         }
-
-        window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; showPwaBanner(); });
-        window.addEventListener('appinstalled', () => { hidePwaBanner(); sessionStorage.removeItem('pwaDismissed'); deferredPrompt = null; });
-
+        
+        // Run iOS check
+        checkIOSPWA();
+        
+        // Install Button
         installBtn.addEventListener('click', async () => {
-            hidePwaBanner();
-            if (isIos()) { showNotification('Install Instructions','Tap share then "Add to Home Screen"', true); }
-            else if (deferredPrompt) {
+            // Hide the banner
+            pwaBanner.classList.remove('show');
+            setTimeout(() => {
+                pwaBanner.style.display = 'none';
+                document.body.style.paddingTop = '20px';
+            }, 500);
+            
+            // Check if we're on iOS
+            if (isIos()) {
+                // Show iOS-specific instructions
+                showNotification('Install Instructions', 'Tap the share icon and select "Add to Home Screen"', true);
+            } else if (deferredPrompt) {
+                // Show the install prompt for non-iOS devices
                 deferredPrompt.prompt();
+                
+                // Wait for the user to respond to the prompt
                 const { outcome } = await deferredPrompt.userChoice;
-                showNotification(outcome==='accepted'?'Installed!':'Info', outcome==='accepted'?'App installed successfully!':'Installation cancelled', true);
+                if (outcome === 'accepted') {
+                    showNotification('Success', 'App installed successfully!', true);
+                } else {
+                    showNotification('Info', 'App installation cancelled', true);
+                }
                 deferredPrompt = null;
             }
         });
-        dismissBtn.addEventListener('click', () => { hidePwaBanner(); sessionStorage.setItem('pwaDismissed','true'); });
-        closeIosBtn.addEventListener('click', () => iosInstructions.classList.remove('show'));
+        
+        // Dismiss Button
+        dismissBtn.addEventListener('click', () => {
+            // Hide banner with animation
+            pwaBanner.classList.remove('show');
+            setTimeout(() => {
+                pwaBanner.style.display = 'none';
+                document.body.style.paddingTop = '20px';
+            }, 500);
+            
+            // Remember dismissal for this session
+            sessionStorage.setItem('pwaDismissed', 'true');
+            showNotification('Info', 'Banner dismissed for this session', true);
+        });
+        
+        // App Installed Event
+        window.addEventListener('appinstalled', () => {
+            // Hide the banner if it's visible
+            pwaBanner.classList.remove('show');
+            pwaBanner.style.display = 'none';
+            document.body.style.paddingTop = '20px';
+            
+            // Clear session storage flag
+            sessionStorage.removeItem('pwaDismissed');
+            deferredPrompt = null;
+        });
 
-        if (isIos()) setTimeout(() => { if (canInstall()) showPwaBanner(); }, 3000);
-
-        // ─── Form toggle ───
+        // Collapsible form functionality
         formToggle.addEventListener('click', () => {
-            const collapsed = formToggle.classList.contains('collapsed');
-            formToggle.classList.toggle('collapsed', !collapsed);
-            formToggle.classList.toggle('expanded', collapsed);
-            formContent.style.height = collapsed ? formContent.scrollHeight + 'px' : '0';
-        });
-
-        // ─── Notification ───
-        function showNotification(title, msg, success = true) {
-            notifTitle.textContent = title;
-            notifMessage.textContent = msg;
-            const icon = notification.querySelector('.notif-icon');
-            notification.classList.toggle('error', !success);
-            icon.className = `fas ${success ? 'fa-check-circle' : 'fa-exclamation-circle'} notif-icon`;
-            notification.classList.add('show');
-            setTimeout(() => notification.classList.remove('show'), 3500);
-        }
-
-        // ─── TTS ───
-        function speak(text) {
-            if (!speech) return;
-            speech.cancel();
-            const u = new SpeechSynthesisUtterance(text);
-            u.rate = 0.9; u.pitch = 1; u.volume = 1;
-            const eng = speech.getVoices().find(v => v.lang.startsWith('en') && v.localService);
-            if (eng) u.voice = eng;
-            speech.speak(u);
-        }
-
-        // ─── Users ───
-        function createUserCard(user) {
-            const c = document.createElement('div');
-            c.className = 'user-card';
-            if (user.id === 'Ernest_Hemingway') c.classList.add('active');
-            c.innerHTML = `<i class="fas fa-feather-alt"></i><span>${user.name}</span>`;
-            c.addEventListener('click', function() {
-                document.querySelectorAll('.user-card').forEach(x => x.classList.remove('active'));
-                this.classList.add('active');
-            });
-            return c;
-        }
-
-        async function loadUsers() {
-            try {
-                const snap = await db.collection('users').get();
-                users = []; userList.innerHTML = '';
-                snap.forEach(doc => { const u={id:doc.id,...doc.data()}; users.push(u); userList.appendChild(createUserCard(u)); });
-                userSelection.classList.add('show');
-            } catch(e) {
-                console.error(e);
-                showNotification('Error','Failed to load writer profiles',false);
-                users = [{id:'Ernest_Hemingway',name:'Ernest Hemingway'},{id:'Virginia_Woolf',name:'Virginia Woolf'},{id:'Toni_Morrison',name:'Toni Morrison'}];
-                users.forEach(u => userList.appendChild(createUserCard(u)));
-                userSelection.classList.add('show');
-            }
-        }
-
-        // ─── Start ───
-        startBtn.addEventListener('click', () => {
-            const active = document.querySelector('.user-card.active');
-            if (!active) return;
-            const selected = users.find(u => u.name === active.querySelector('span').textContent);
-            if (!selected) return;
-            currentUser = selected;
-            currentUserName.textContent = currentUser.name;
-            userSelection.style.opacity = '0'; userSelection.style.transform = 'translateY(-16px)';
-            setTimeout(() => { userSelection.classList.remove('show'); appContent.classList.add('show'); loadWords(); }, 550);
-        });
-
-        // ─── Word form ───
-        wordForm.addEventListener('submit', async e => {
-            e.preventDefault();
-            const word = document.getElementById('word').value.trim();
-            const pron  = document.getElementById('pronunciation').value.trim();
-            const def   = document.getElementById('definition').value.trim();
-            if (!word||!pron||!def) { showNotification('Validation Error','Please fill all fields',false); return; }
-
-            const btn = wordForm.querySelector('button[type="submit"]');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-            btn.disabled = true;
-
-            try {
-                await db.collection('words').add({
-                    word, pronunciation: pron, definition: def,
-                    userId: currentUser.id, userName: currentUser.name,
-                    reactions: {},
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                showNotification('Word Added!', `"${word}" added to the shared oculus`);
-                wordForm.reset();
-            } catch(err) {
-                console.error(err);
-                showNotification('Error','Failed to add word',false);
-            } finally {
-                btn.innerHTML = '<i class="fas fa-feather"></i> Add to Oculus';
-                btn.disabled = false;
-                formToggle.classList.remove('expanded'); formToggle.classList.add('collapsed');
+            const isCollapsed = formToggle.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                formToggle.classList.remove('collapsed');
+                formToggle.classList.add('expanded');
+                formContent.style.height = formContent.scrollHeight + 'px';
+            } else {
+                formToggle.classList.remove('expanded');
+                formToggle.classList.add('collapsed');
                 formContent.style.height = '0';
             }
         });
 
-        // ─── Random word ───
-        randomWordBtn.addEventListener('click', () => {
-            if (!words.length) { showNotification('No Words','Add some words first',false); return; }
-            const r = words[Math.floor(Math.random()*words.length)];
-            popupWord.textContent = r.word; popupPron.textContent = r.pronunciation;
-            popupDef.textContent = r.definition; popupUser.textContent = `Added by: ${r.userName}`;
-            popupOverlay.classList.add('show');
-        });
-
-        // ─── Popup ───
-        closePopup.addEventListener('click', () => popupOverlay.classList.remove('show'));
-        popupSpeaker.addEventListener('click', () => speak(`${popupWord.textContent}. ${popupDef.textContent}`));
-        popupOverlay.addEventListener('click', e => { if(e.target===popupOverlay) popupOverlay.classList.remove('show'); });
-
-        // ─── Reactions ───
-        function renderReactions(word, card) {
-            const container = card.querySelector('.reactions-container');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const counts={}, names={};
-            if (word.reactions) {
-                Object.entries(word.reactions).forEach(([uid,emoji]) => {
-                    counts[emoji] = (counts[emoji]||0)+1;
-                    if (!names[emoji]) names[emoji]=[];
-                    const u = users.find(x=>x.id===uid);
-                    if (u) names[emoji].push(u.name);
-                });
+        // Show notification function
+        function showNotification(title, message, isSuccess = true) {
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            if (isSuccess) {
+                notification.classList.remove('error');
+            } else {
+                notification.classList.add('error');
             }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3500);
+        }
 
-            Object.keys(counts).forEach(emoji => {
-                const el = document.createElement('div');
-                el.className = 'reaction';
-                if (currentUser && word.reactions?.[currentUser.id]===emoji) el.classList.add('active');
-                el.innerHTML = `<span>${emoji}</span><span class="reaction-count">${counts[emoji]}</span><div class="reaction-tooltip">${(names[emoji]||[]).join(', ')||'No users'}</div>`;
-                el.addEventListener('click', e => {
-                    e.stopPropagation();
-                    if (currentUser) toggleReaction(word.id, emoji);
-                    else showNotification('Error','Select a writer profile first',false);
-                });
-                container.appendChild(el);
-            });
-
-            if (!currentUser || !word.reactions?.[currentUser.id]) {
-                const addBtn = document.createElement('div');
-                addBtn.className = 'add-reaction';
-                addBtn.innerHTML = `<span>+</span><div class="reaction-tooltip">Add reaction</div>`;
-                let timer, long=false;
-                const startLP = e => { e.preventDefault(); e.stopPropagation(); long=false; timer=setTimeout(()=>{long=true;showReactionDropdown(word.id,addBtn);},500); };
-                const endLP   = () => { clearTimeout(timer); if (!long) showReactionDropdown(word.id,addBtn); };
-                addBtn.addEventListener('mousedown', startLP); addBtn.addEventListener('touchstart', startLP);
-                addBtn.addEventListener('mouseup', endLP);     addBtn.addEventListener('touchend', endLP);
-                addBtn.addEventListener('mouseleave', ()=>clearTimeout(timer));
-                addBtn.addEventListener('click', e => { e.stopPropagation(); showReactionDropdown(word.id,addBtn); });
-                container.appendChild(addBtn);
+        // Text-to-speech function
+        function speakText(text) {
+            if (speechSynthesis) {
+                // Cancel any ongoing speech
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Set voice properties
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                utterance.volume = 1;
+                
+                // Find a suitable voice
+                const voices = speechSynthesis.getVoices();
+                const englishVoice = voices.find(voice => 
+                    voice.lang.startsWith('en') && voice.localService === true
+                );
+                
+                if (englishVoice) {
+                    utterance.voice = englishVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                showNotification('Error', 'Text-to-speech not supported in your browser', false);
             }
         }
 
-        function showReactionDropdown(wordId, button) {
-            document.querySelectorAll('.reaction-dropdown').forEach(d=>d.remove());
-            const drop = document.createElement('div');
-            drop.className = 'reaction-dropdown show';
-            const word = words.find(w=>w.id===wordId);
-            const cur  = word?.reactions?.[currentUser?.id] ?? null;
-            emojiOptions.forEach(emoji => {
-                const opt = document.createElement('button');
-                opt.className = 'reaction-option'; if(emoji===cur) opt.classList.add('active');
-                opt.textContent = emoji;
-                opt.addEventListener('click', e => { e.stopPropagation(); toggleReaction(wordId,emoji); drop.remove(); });
-                drop.appendChild(opt);
-            });
-            const rect = button.getBoundingClientRect();
-            drop.style.left   = `${rect.left + rect.width/2}px`;
-            drop.style.bottom = `${window.innerHeight - rect.top + 10}px`;
-            document.body.appendChild(drop);
-            function close(e) { if(!drop.contains(e.target)&&!button.contains(e.target)){ drop.remove(); document.removeEventListener('click',close); document.removeEventListener('touchstart',close); } }
-            setTimeout(()=>{ document.addEventListener('click',close); document.addEventListener('touchstart',close); },10);
-        }
-
-        async function toggleReaction(wordId, emoji) {
-            if (!currentUser) { showNotification('Error','Select a writer profile first',false); return; }
+        // Load user profiles from Firestore
+        async function loadUsers() {
             try {
-                const ref = db.collection('words').doc(wordId);
-                const doc = await ref.get();
-                const reactions = doc.data().reactions||{};
-                if (reactions[currentUser.id]===emoji) { delete reactions[currentUser.id]; showNotification('Reaction Removed',`Removed ${emoji}`,true); }
-                else { reactions[currentUser.id]=emoji; showNotification('Reaction Added',`Added ${emoji}`,true); }
-                await ref.update({reactions});
-            } catch(e) { console.error(e); showNotification('Error','Failed to update reaction',false); }
+                const usersSnapshot = await db.collection('users').get();
+                users = [];
+                userList.innerHTML = '';
+                
+                usersSnapshot.forEach(doc => {
+                    const user = {
+                        id: doc.id,
+                        ...doc.data()
+                    };
+                    users.push(user);
+                    
+                    // Create user card
+                    const userCard = document.createElement('div');
+                    userCard.className = 'user-card';
+                    if (doc.id === 'Ernest_Hemingway') userCard.classList.add('active');
+                    
+                    userCard.innerHTML = `
+                        <i class="fas fa-user"></i>
+                        <span>${user.name}</span>
+                    `;
+                    
+                    userCard.addEventListener('click', function() {
+                        document.querySelectorAll('.user-card').forEach(c => {
+                            c.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    });
+                    
+                    userList.appendChild(userCard);
+                });
+                
+                // Show user selection
+                userSelection.classList.add('show');
+                
+            } catch (error) {
+                console.error("Error loading users: ", error);
+                showNotification('Error', 'Failed to load writer profiles', false);
+                
+                // Fallback to default users if Firestore fails
+                const defaultUsers = [
+                    { id: 'Ernest_Hemingway', name: 'Ernest Hemingway' },
+                    { id: 'Virginia_Woolf', name: 'Virginia Woolf' },
+                    { id: 'Toni_Morrison', name: 'Toni Morrison' }
+                ];
+                
+                users = defaultUsers;
+                renderUserCards(defaultUsers);
+                
+                // Show user selection
+                userSelection.classList.add('show');
+            }
         }
 
-        // ─── Load words ───
+        // Render user cards
+        function renderUserCards(users) {
+            userList.innerHTML = '';
+            
+            users.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                if (user.id === 'Ernest_Hemingway') userCard.classList.add('active');
+                
+                userCard.innerHTML = `
+                    <i class="fas fa-user"></i>
+                    <span>${user.name}</span>
+                `;
+                
+                userCard.addEventListener('click', function() {
+                    document.querySelectorAll('.user-card').forEach(c => {
+                        c.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+                
+                userList.appendChild(userCard);
+            });
+        }
+
+        // Render reactions for a word
+        function renderReactions(word, wordCard) {
+            const reactionsContainer = wordCard.querySelector('.reactions-container');
+            if (!reactionsContainer) return;
+            
+            reactionsContainer.innerHTML = '';
+            
+            // Group reactions by emoji and count
+            const reactionCounts = {};
+            const reactionUsers = {};
+            
+            if (word.reactions) {
+                Object.entries(word.reactions).forEach(([userId, emoji]) => {
+                    if (!reactionCounts[emoji]) {
+                        reactionCounts[emoji] = 0;
+                        reactionUsers[emoji] = [];
+                    }
+                    reactionCounts[emoji]++;
+                    
+                    // Find user name
+                    const user = users.find(u => u.id === userId);
+                    if (user) {
+                        reactionUsers[emoji].push(user.name);
+                    }
+                });
+            }
+            
+            // Create reaction elements for each emoji
+            Object.keys(reactionCounts).forEach(emoji => {
+                const reactionDiv = document.createElement('div');
+                reactionDiv.className = 'reaction';
+                if (currentUser && word.reactions && word.reactions[currentUser.id] === emoji) {
+                    reactionDiv.classList.add('active');
+                }
+                reactionDiv.dataset.emoji = emoji;
+                
+                // Create tooltip text
+                const tooltipText = reactionUsers[emoji].join(', ') || 'No users';
+                
+                reactionDiv.innerHTML = `
+                    <span class="emoji">${emoji}</span>
+                    <span class="reaction-count">${reactionCounts[emoji]}</span>
+                    <div class="reaction-tooltip">
+                        ${tooltipText}
+                    </div>
+                `;
+                
+                // Add click event to remove reaction if already reacted
+                reactionDiv.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (currentUser) {
+                        toggleReaction(word.id, emoji);
+                    } else {
+                        showNotification('Error', 'Please select a writer profile first', false);
+                    }
+                });
+                
+                reactionsContainer.appendChild(reactionDiv);
+            });
+            
+            // Add "Add Reaction" button if user hasn't reacted or no reactions exist
+            if (!currentUser || !word.reactions || !word.reactions[currentUser.id]) {
+                const addReactionBtn = document.createElement('div');
+                addReactionBtn.className = 'add-reaction';
+                addReactionBtn.innerHTML = `
+                    <span>+</span>
+                    <div class="reaction-tooltip">Tap to add reaction</div>
+                `;
+                
+                // Touch/Mouse events for reaction dropdown
+                let longPressTimer;
+                let isLongPress = false;
+                
+                addReactionBtn.addEventListener('mousedown', startLongPress);
+                addReactionBtn.addEventListener('touchstart', startLongPress);
+                
+                addReactionBtn.addEventListener('mouseup', cancelLongPress);
+                addReactionBtn.addEventListener('touchend', cancelLongPress);
+                addReactionBtn.addEventListener('mouseleave', cancelLongPress);
+                
+                function startLongPress(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    isLongPress = false;
+                    longPressTimer = setTimeout(() => {
+                        isLongPress = true;
+                        showReactionDropdown(word.id, addReactionBtn);
+                    }, 500); // 500ms for long press
+                }
+                
+                function cancelLongPress() {
+                    clearTimeout(longPressTimer);
+                    if (!isLongPress) {
+                        // If it was a short tap, show dropdown anyway
+                        showReactionDropdown(word.id, addReactionBtn);
+                    }
+                }
+                
+                // Also respond to click for better accessibility
+                addReactionBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showReactionDropdown(word.id, addReactionBtn);
+                });
+                
+                reactionsContainer.appendChild(addReactionBtn);
+            }
+        }
+
+        // Show reaction dropdown
+        function showReactionDropdown(wordId, button) {
+            // Close any open dropdowns
+            document.querySelectorAll('.reaction-dropdown').forEach(d => d.remove());
+            
+            // Create dropdown
+            const dropdown = document.createElement('div');
+            dropdown.className = 'reaction-dropdown show';
+            
+            // Get word reactions to highlight current user's reaction
+            const word = words.find(w => w.id === wordId);
+            const currentUserReaction = word && word.reactions && currentUser ? word.reactions[currentUser.id] : null;
+            
+            emojiOptions.forEach(emoji => {
+                const option = document.createElement('button');
+                option.className = 'reaction-option';
+                if (emoji === currentUserReaction) {
+                    option.classList.add('active');
+                }
+                option.textContent = emoji;
+                option.dataset.emoji = emoji;
+                
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleReaction(wordId, emoji);
+                    dropdown.remove();
+                });
+                
+                dropdown.appendChild(option);
+            });
+            
+            // Position dropdown
+            const rect = button.getBoundingClientRect();
+            dropdown.style.position = 'fixed';
+            dropdown.style.left = `${rect.left + rect.width/2}px`;
+            dropdown.style.transform = 'translateX(-50%)';
+            dropdown.style.bottom = `${window.innerHeight - rect.top + 10}px`;
+            
+            document.body.appendChild(dropdown);
+            
+            // Close dropdown when clicking outside
+            function closeDropdown(e) {
+                if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+                    dropdown.remove();
+                    document.removeEventListener('click', closeDropdown);
+                    document.removeEventListener('touchstart', closeDropdown);
+                }
+            }
+            
+            setTimeout(() => {
+                document.addEventListener('click', closeDropdown);
+                document.addEventListener('touchstart', closeDropdown);
+            }, 10);
+        }
+
+        // Toggle reaction for a word
+        async function toggleReaction(wordId, emoji) {
+            if (!currentUser) {
+                showNotification('Error', 'Please select a writer profile first', false);
+                return;
+            }
+            
+            try {
+                const wordRef = db.collection('words').doc(wordId);
+                const wordDoc = await wordRef.get();
+                const wordData = wordDoc.data();
+                
+                // Initialize reactions object if it doesn't exist
+                const reactions = wordData.reactions || {};
+                
+                // Check if user already reacted with this emoji
+                if (reactions[currentUser.id] === emoji) {
+                    // Remove reaction
+                    delete reactions[currentUser.id];
+                    showNotification('Reaction Removed', `Removed ${emoji} reaction`, true);
+                } else {
+                    // Add or change reaction
+                    reactions[currentUser.id] = emoji;
+                    showNotification('Reaction Added', `Added ${emoji} reaction`, true);
+                }
+                
+                // Update in Firebase
+                await wordRef.update({ reactions });
+                
+            } catch (error) {
+                console.error('Error updating reaction: ', error);
+                showNotification('Error', 'Failed to update reaction', false);
+            }
+        }
+
+        // Load all words from central collection with real-time updates
         function loadWords() {
             try {
-                db.collection('words').orderBy('timestamp','desc').onSnapshot(snap => {
-                    words=[]; wordsList.innerHTML='';
-                    snap.forEach(doc => {
-                        const word={id:doc.id,...doc.data()};
-                        words.push(word);
-                        const date = word.timestamp.toDate();
-                        const fmt  = date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-                        const card = document.createElement('div');
-                        card.className='word-card';
-                        card.innerHTML=`
-                            <div class="word-header">
-                                <div class="word-text">${word.word}</div>
-                                <button class="speaker-btn" data-word="${word.word}" data-def="${word.definition}"><i class="fas fa-volume-up"></i></button>
-                            </div>
-                            <div class="pronunciation">${word.pronunciation}</div>
-                            <div class="definition">${word.definition}</div>
-                            <div class="reactions-container"></div>
-                            <div class="word-footer">
-                                <span>${fmt}</span>
-                                <span class="user-tag"><i class="fas fa-feather-alt"></i>${word.userName}</span>
-                            </div>`;
-                        renderReactions(word, card);
-                        card.addEventListener('click', e => {
-                            if (!e.target.closest('.speaker-btn')&&!e.target.closest('.reaction')&&!e.target.closest('.add-reaction')) {
-                                popupWord.textContent=word.word; popupPron.textContent=word.pronunciation;
-                                popupDef.textContent=word.definition; popupUser.textContent=`Added by: ${word.userName}`;
-                                popupOverlay.classList.add('show');
-                            }
+                // Set up real-time listener
+                db.collection('words')
+                    .orderBy('timestamp', 'desc')
+                    .onSnapshot((snapshot) => {
+                        words = [];
+                        wordsListContainer.innerHTML = '';
+                        
+                        snapshot.forEach(doc => {
+                            const word = {
+                                id: doc.id,
+                                ...doc.data()
+                            };
+                            words.push(word);
+                            
+                            // Format date
+                            const date = word.timestamp.toDate();
+                            const formattedDate = date.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                            });
+                            
+                            // Create word card
+                            const wordCard = document.createElement('div');
+                            wordCard.className = 'word-card';
+                            wordCard.innerHTML = `
+                                <div class="word-header">
+                                    <div class="word-text">${word.word}</div>
+                                    <button class="speaker-btn" data-word="${word.word}" data-definition="${word.definition}">
+                                        <i class="fas fa-volume-up"></i>
+                                    </button>
+                                </div>
+                                <div class="pronunciation">${word.pronunciation}</div>
+                                <div class="definition">${word.definition}</div>
+                                <div class="reactions-container">
+                                    <!-- Reactions will be rendered here -->
+                                </div>
+                                <div class="word-footer">
+                                    <div>${formattedDate}</div>
+                                    <div class="user-tag">${word.userName}</div>
+                                </div>
+                            `;
+                            
+                            // Render reactions
+                            renderReactions(word, wordCard);
+                            
+                            // Add click event to show word details
+                            wordCard.addEventListener('click', (e) => {
+                                // Don't trigger if clicking the speaker button or reaction
+                                if (!e.target.closest('.speaker-btn') && !e.target.closest('.reaction') && !e.target.closest('.add-reaction')) {
+                                    popupWord.textContent = word.word;
+                                    popupPronunciation.textContent = word.pronunciation;
+                                    popupDefinition.textContent = word.definition;
+                                    popupUser.textContent = `Added by: ${word.userName}`;
+                                    popupOverlay.classList.add('show');
+                                }
+                            });
+                            
+                            // Add event listener to speaker button
+                            const speakerBtn = wordCard.querySelector('.speaker-btn');
+                            speakerBtn.addEventListener('click', (e) => {
+                                e.stopPropagation(); // Prevent triggering the card click event
+                                const wordText = speakerBtn.getAttribute('data-word');
+                                const definition = speakerBtn.getAttribute('data-definition');
+                                speakText(`${wordText}. ${definition}`);
+                            });
+                            
+                            wordsListContainer.appendChild(wordCard);
                         });
-                        card.querySelector('.speaker-btn').addEventListener('click', e => { e.stopPropagation(); speak(`${word.word}. ${word.definition}`); });
-                        wordsList.appendChild(card);
+                        
+                        // Update word count
+                        wordCount.textContent = `${words.length} ${words.length === 1 ? 'word' : 'words'}`;
+                        
+                        // Show empty state if no words
+                        if (words.length === 0) {
+                            wordsListContainer.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fas fa-book-open"></i>
+                                    <h3>Your Oculus is Empty</h3>
+                                    <p>Add your first word to expand your writer's vocabulary</p>
+                                </div>
+                            `;
+                        }
+                    }, (error) => {
+                        console.error("Error loading words: ", error);
+                        showNotification('Error', 'Failed to load vocabulary words', false);
                     });
-                    wordCountEl.textContent=`${words.length} ${words.length===1?'word':'words'}`;
-                    if (!words.length) wordsList.innerHTML=`<div class="empty-state"><div class="empty-eye"><i class="fas fa-eye"></i></div><h3>Your Oculus is Empty</h3><p>Add your first word to expand your writer's vocabulary</p></div>`;
-                }, err=>{ console.error(err); showNotification('Error','Failed to load words',false); });
-            } catch(e){ console.error(e); showNotification('Error','Failed to load words',false); }
-        }
-
-        // ─── Init ───
-        function init() {
-            loadUsers();
-            setTimeout(() => {
-                loadingScreen.classList.add('hidden');
-                setTimeout(() => { loadingScreen.style.display='none'; mainContainer.classList.add('show'); }, 800);
-            }, 4000);
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+                
+            } catch (error) {
+                console.error("Error loading words: ", error);
+                showNotification('Error', 'Failed to load vocabulary words', false);
             }
         }
+
+        // Start with selected user
+        startBtn.addEventListener('click', () => {
+            const activeCard = document.querySelector('.user-card.active');
+            if (activeCard) {
+                const userName = activeCard.querySelector('span').textContent;
+                const selectedUser = users.find(user => user.name === userName);
+                
+                if (selectedUser) {
+                    currentUser = selectedUser;
+                    currentUserName.textContent = currentUser.name;
+                    
+                    // Animate out the user selection
+                    userSelection.style.opacity = '0';
+                    userSelection.style.transform = 'translateY(-30px)';
+                    
+                    // After animation completes, show the app content
+                    setTimeout(() => {
+                        userSelection.classList.remove('show');
+                        appContent.classList.add('show');
+                        loadWords(); // Load all words for all users
+                    }, 800);
+                }
+            }
+        });
+
+        // Save word to central collection
+        wordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const word = document.getElementById('word').value.trim();
+            const pronunciation = document.getElementById('pronunciation').value.trim();
+            const definition = document.getElementById('definition').value.trim();
+            
+            if (!word || !pronunciation || !definition) {
+                showNotification('Validation Error', 'Please fill all fields', false);
+                return;
+            }
+            
+            try {
+                // Create a loading effect on button
+                const btn = wordForm.querySelector('button');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+                btn.disabled = true;
+                
+                // Add word to central collection with user info
+                await db.collection('words').add({
+                    word,
+                    pronunciation,
+                    definition,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    reactions: {}, // Initialize empty reactions object
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Show success notification
+                showNotification('Word Added!', `"${word}" added to the shared oculus`);
+                
+                // Reset form
+                wordForm.reset();
+                
+                // Reload words will happen automatically via real-time listener
+                
+            } catch (error) {
+                console.error('Error adding word: ', error);
+                showNotification('Error', 'Failed to add word', false);
+            } finally {
+                // Reset button
+                const btn = wordForm.querySelector('button');
+                btn.innerHTML = '<i class="fas fa-feather"></i> Add to Oculus';
+                btn.disabled = false;
+                
+                // Collapse the form after adding
+                formToggle.classList.remove('expanded');
+                formToggle.classList.add('collapsed');
+                formContent.style.height = '0';
+            }
+        });
+
+        // Random word popup
+        randomWordBtn.addEventListener('click', () => {
+            if (words.length > 0) {
+                const randomIndex = Math.floor(Math.random() * words.length);
+                const randomWord = words[randomIndex];
+                
+                popupWord.textContent = randomWord.word;
+                popupPronunciation.textContent = randomWord.pronunciation;
+                popupDefinition.textContent = randomWord.definition;
+                popupUser.textContent = `Added by: ${randomWord.userName}`;
+                
+                popupOverlay.classList.add('show');
+            } else {
+                showNotification('No Words', 'Add some words to your oculus first', false);
+            }
+        });
+
+        // Close popup
+        closePopup.addEventListener('click', () => {
+            popupOverlay.classList.remove('show');
+        });
+
+        // Popup speaker button
+        popupSpeakerBtn.addEventListener('click', () => {
+            const word = popupWord.textContent;
+            const definition = popupDefinition.textContent;
+            speakText(`${word}. ${definition}`);
+        });
+
+        // Close popup when clicking outside
+        popupOverlay.addEventListener('click', (e) => {
+            if (e.target === popupOverlay) {
+                popupOverlay.classList.remove('show');
+            }
+        });
+
+        // Initialize the app
+        function init() {
+            loadUsers();
+            
+            // Hide loading screen after data is loaded or 4 seconds, whichever comes first
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    mainContainer.classList.add('show');
+                }, 500);
+            }, 4000);
+            
+            // Register service worker for PWA
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered: ', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed: ', error);
+                    });
+                });
+            }
+        }
+
+        // Start the app
         init();
     </script>
 </body>

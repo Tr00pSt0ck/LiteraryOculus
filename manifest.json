@@ -5,8 +5,8 @@
   "start_url": "https://tr00pst0ck.github.io/LiteraryOculus/dashboard.html",
   "display": "fullscreen",
   "orientation": "portrait",
-  "theme_color": "#3E2723",
-  "background_color": "#3E2723",
+  "theme_color": "#050508",
+  "background_color": "#050508",
   "icons": [
     {
       "src": "https://tr00pst0ck.github.io/LiteraryOculus/icons/favicon-192x192.png",
